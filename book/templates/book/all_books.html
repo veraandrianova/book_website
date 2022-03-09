@@ -1,9 +1,17 @@
-{% extends 'book/base.html%}
+{% extends 'book/base.html'%}
 
 
-{% block title %}Все фильмы{% endblock %}
+{% block title %}Все книг{% endblock %}
 
 
 {% block content %}
-     <h2>Список всех фильмов</h2>
+     <h2>Список всех книг</h2>
+     <ul>
+          {% for book in books %}
+              <li><a href="{{ book.get_url }}">{{book.title}}</a></li>
+          {% endfor %}
+     </ul>
+     <h3>Средний рейтинг - {{ agg.rating__avg }}</h3>
+     <h3>Всего книг - {{ agg.id__count }} </h3>
 {% endblock %}
+

@@ -1,0 +1,11 @@
+{% extends 'book/base.html'%}
+
+
+{% block title %}Информация о книге  - {{ book.title }}{% endblock %}
+
+
+{% block content %}
+     <h2>Информация о книге - {{ book.title }}</h2>
+     <h3>Автор - {{ book.author }}</h3>
+     <h3>Рейтинг - {{ book.rating }}</h3>
+{% endblock %}
