@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Book
+from .models import Book, Autor, Year
 # Register your models here.
 class RatingFilter(admin.SimpleListFilter):
     title = 'Фильтр по рейтингу'
@@ -21,7 +21,8 @@ class RatingFilter(admin.SimpleListFilter):
 class BookAdmin(admin.ModelAdmin):
     exclude = ['slug']
     list_display = ['title', 'rating', 'is_best_selling', 'author', 'rating_status']
-    list_editable = ['rating', 'is_best_selling', 'author']
+    list_editable = ['rating', 'is_best_selling']
+    filter_horizontal = ['year']
     ordering = ["title"]
     list_per_page = 10
     search_fields = ['title']
@@ -36,5 +37,13 @@ class BookAdmin(admin.ModelAdmin):
         if book.rating <= 85:
             return 'Хорошая книга'
         return 'Отличный выбор'
+class YearAdmin(admin.ModelAdmin):
+    ordering = ["year"]
+
+class AutorAdmin(admin.ModelAdmin):
+    ordering = ["lastname"]
+
 admin.site.register(Book, BookAdmin)
+admin.site.register(Autor)
+admin.site.register(Year)
 
