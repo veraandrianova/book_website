@@ -1,0 +1,17 @@
+{% extends 'pub_house/base_2.html'%}
+
+
+{% block title %}Все издательства{% endblock %}
+
+
+{% block content %}
+     <h2>Список всех издательств</h2>
+     <ul>
+          {% for pub_house in pub_houses %}
+              <li><a href="{{ pub_house.get_url }}">{{pub_house.name_house}}</a></li>
+          {% endfor %}
+     </ul>
+<h3>Всего издательст - {{ agg_house.id__count }} </h3>
+{% endblock %}
+
+

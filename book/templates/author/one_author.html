@@ -1,0 +1,17 @@
+{% extends 'author/base_1.html'%}
+
+
+{% block title %}Информация об авторе  - {{ author.name }}{% endblock %}
+
+
+{% block content %}
+     <h3>Информация об авторе</h3>
+     <h3>Имя - {{ author.firstname }}</h3>
+     <h3>Фамилия - {{ author.lastname  }}</h3>
+     <h3>Почта - {{ author.email }}</h3>
+     <h3>Список книг:</h3>
+     <ul> {% for book in  author.book_set.all %} </ul>
+              <li>{{ book }}</li>
+          {% endfor %}
+{% endblock %}
+

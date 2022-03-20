@@ -1,0 +1,17 @@
+{% extends 'pub_house/base_2.html'%}
+
+
+{% block title %}Информация об издательстве  - {{ pub_house.name_house }}{% endblock %}
+
+
+{% block content %}
+     <h3>Информация об издательстве</h3>
+     <h3>Название - {{ pub_house.name_house }}</h3>
+     <h3>Почта - {{ pub_house.email }}</h3>
+     <h3>Адрес - {{ pub_house.address }}</h3>
+     <h3>Список книг:</h3>
+     <ul> {% for book in  pub_house.book_set.all %} </ul>
+              <li>{{ book }}</li>
+          {% endfor %}
+{% endblock %}
+
