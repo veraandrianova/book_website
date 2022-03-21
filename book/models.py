@@ -39,6 +39,16 @@ class Pub_house(models.Model):
         return f"{self.name_house}"
 
 
+class Book_Place(models.Model):
+    rack = models.IntegerField(validators=[MinValueValidator(1),
+                                             MaxValueValidator(100)])
+    number  = models.IntegerField(validators=[MinValueValidator(1),
+                                             MaxValueValidator(100)])
+    def __str__(self):
+        return f"{self.rack}.{self.number}"
+
+
+
 class Book(models.Model):
     class Meta:
         verbose_name = 'книга'
@@ -52,6 +62,7 @@ class Book(models.Model):
     slug = models.SlugField(default='', null=False)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True)
     pub_house = models.ManyToManyField(Pub_house)
+    book_place = models.OneToOneField(Book_Place, on_delete=models.SET_NULL, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(translit(self.title, 'ru', reversed=True))
@@ -62,3 +73,5 @@ class Book(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.rating}"
+
+
