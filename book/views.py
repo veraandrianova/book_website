@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Book
-from .models import Author, Pub_house
+from .models import Author, PubHouse
 from django.db.models import F, Sum, Avg, Max, Min, Count
 # Create your views here.
 def all_authors(request):
@@ -35,7 +35,7 @@ def one_books(request, slug_book:str):
 
 
 def all_pub_houses(request):
-    pub_houses = Pub_house.objects.order_by(F("name_house").asc(nulls_last=True))
+    pub_houses = PubHouse.objects.order_by(F("name_house").asc(nulls_last=True))
     agg_house = pub_houses.aggregate(Count('id'))
     return render(request, 'pub_house/all_pub_houses.html', {
         'pub_houses': pub_houses,
@@ -44,7 +44,7 @@ def all_pub_houses(request):
     })
 
 def one_pub_house(request, slug_pub_house:str):
-    pub_house = get_object_or_404(Pub_house, slug=slug_pub_house)
+    pub_house = get_object_or_404(PubHouse, slug=slug_pub_house)
     return render(request, 'pub_house/one_pub_house.html', {
         'pub_house': pub_house,
 

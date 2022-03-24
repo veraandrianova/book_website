@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from transliterate import translit
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+
 class Author(models.Model):
     firstname = models.CharField(max_length=70)
     lastname = models.CharField(max_length=70)
@@ -22,7 +23,7 @@ class Author(models.Model):
         return f"{self.firstname} {self.lastname}"
 
 
-class Pub_house(models.Model):
+class PubHouse(models.Model):
     name_house = models.CharField(max_length=70)
     email = models.CharField(max_length=70)
     slug = models.SlugField(default='', null=False, blank=True)
@@ -30,7 +31,7 @@ class Pub_house(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(translit(self.name_house, 'ru', reversed=True))
-        super(Pub_house, self).save(*args, **kwargs)
+        super(PubHouse, self).save(*args, **kwargs)
 
     def get_url(self):
         return reverse('pub_house_details', args=[self.slug])
@@ -54,6 +55,10 @@ class Book(models.Model):
         verbose_name = 'книга'
         verbose_name_plural = 'книги'
 
+    COVER_CHOICES = [
+        ('solid', 'Твердый переплет'),
+        ('soft', 'Мягкий переплет'),
+    ]
 
     title = models.CharField(max_length=70, verbose_name='название')
     rating = models.IntegerField(validators=[MinValueValidator(1),
@@ -61,7 +66,8 @@ class Book(models.Model):
     is_best_selling = models.BooleanField(null=True, blank=True)
     slug = models.SlugField(default='', null=False)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True)
-    pub_house = models.ManyToManyField(Pub_house)
+    cover = models.CharField(max_length=10, choices=COVER_CHOICES, default='solid', verbose_name='переплет')
+    pub_house = models.ManyToManyField(PubHouse)
     book_place = models.OneToOneField(Book_Place, on_delete=models.SET_NULL, null=True, blank=True)
 
     def save(self, *args, **kwargs):
