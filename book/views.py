@@ -1,11 +1,10 @@
 from django.db.models import F, Avg, Count
 from django.shortcuts import render, get_object_or_404, reverse, redirect
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView
 from .models import Author, PubHouse
 from .models import Book, Users
 from .forms import UsersForm
-from django.views.generic.edit import CreateView
-
+from django.views.generic.edit import CreateView, UpdateView
 # Create your views here.
 def all_authors(request):
     authors = Author.objects.order_by(F("lastname").asc(nulls_last=True))
@@ -84,15 +83,18 @@ def users_create(request):
     }
     return render(request, 'users/create.html', data)
 
-
-def one_create(request, id: int):
-    user = get_object_or_404(Users,id = id)
-    return render(request, 'users/create_one.html', {
-        'user': user
-     })
+class NewUses(DetailView):
+    model = Users
+    template_name = 'users/create_one.html'
+    context_object_name = 'user'
+# def one_create(request, id: int):
+#     user = get_object_or_404(Users,id = id)
+#     return render(request, 'users/create_one.html', {
+#         'user': user
+#      })
 class NewsUpdateNew(UpdateView):
     model = Users
-    template_name = 'create.html'
+    template_name = 'users/update_user.html'
     fields = ['firstname', 'lastname', 'email', 'phone', 'sex', 'age']
 
 

@@ -12,5 +12,8 @@
      <ul> {% for book in  user.books.all %} </ul>
               <li>{{ book }}</li>
           {% endfor %}
+     <nav>
+          <a href='{% url 'update_user' user.pk %}'>Редактировать</a>
+     </nav>
 {% endblock %}
 
