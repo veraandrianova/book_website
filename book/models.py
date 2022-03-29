@@ -5,6 +5,7 @@ from transliterate import translit
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
+
 class Author(models.Model):
     firstname = models.CharField(max_length=70)
     lastname = models.CharField(max_length=70)
@@ -80,4 +81,19 @@ class Book(models.Model):
     def __str__(self):
         return f"{self.title} - {self.rating}"
 
+class Users(models.Model):
+    COVER_CHOICES = [
+        ('male', 'Мужской'),
+        ('female', 'Женский'),
+    ]
+    firstname = models.CharField(max_length=70)
+    lastname = models.CharField(max_length=70)
+    email = models.CharField(max_length=70)
+    phone = models.CharField(max_length=13)
+    age = models.IntegerField(validators=[MinValueValidator(1),
+                                             MaxValueValidator(100)], default=18)
+    sex = models.CharField(max_length=10, choices=COVER_CHOICES, default='male', verbose_name='пол')
+    books = models.ManyToManyField(Book)
 
+    def get_absolute_url(self):
+        return reverse('one_user', args=[str(self.id)])

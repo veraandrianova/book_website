@@ -1,0 +1,16 @@
+{% extends 'users/base_3.html'%}
+
+{% block title %}Информация о пользователе  - {{ user.firstname }}{% endblock %}
+
+{% block content %}
+     <h3>Информация о пользователе</h3>
+     <h3>Имя - {{ user.firstname }}</h3>
+     <h3>Фамилия - {{ user.lastname  }}</h3>
+     <h3>Почта - {{ user.email }}</h3>
+     <h3>Телефон - {{ user.phone }}</h3>
+     <h3>Список книг:</h3>
+     <ul> {% for book in  user.books.all %} </ul>
+              <li>{{ book }}</li>
+          {% endfor %}
+{% endblock %}
+

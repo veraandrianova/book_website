@@ -1,0 +1,25 @@
+{% extends 'users/base_3.html'%}
+
+
+{% block title %}Регистрация{% endblock %}
+
+
+{% block content %}
+     <h2>Регистрация</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.firstname }}<br>
+        {{ form.lastname }}<br>
+        {{ form.email }}<br>
+        {{ form.phone }}<br>
+        {{ form.age }}<br>
+        {{ form.sex }}<br>
+        <span>{{ error }}</span>
+
+        <button type="submit">Добавить</button>
+    </form>
+
+
+
+{% endblock %}
