@@ -8,6 +8,8 @@
      <h3>Фамилия - {{ user.lastname  }}</h3>
      <h3>Почта - {{ user.email }}</h3>
      <h3>Телефон - {{ user.phone }}</h3>
+     <h3>Пол - {{ user.sex }}</h3>
+     <h3>Возраст - {{ user.age }}</h3>
      <h3>Список книг:</h3>
      <ul> {% for book in  user.books.all %} </ul>
               <li>{{ book }}</li>
@@ -15,5 +17,8 @@
      <nav>
           <a href='{% url 'update_user' user.pk %}'>Редактировать</a>
      </nav>
+      <nav>
+           <a href="{% url 'delete_user' user.pk %}">Удалить профиль</a>
+      </nav>
 {% endblock %}
 

@@ -1,10 +1,10 @@
 from django.db.models import F, Avg, Count
 from django.shortcuts import render, get_object_or_404, reverse, redirect
-from django.views.generic import DetailView
 from .models import Author, PubHouse
 from .models import Book, Users
 from .forms import UsersForm
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 # Create your views here.
 def all_authors(request):
     authors = Author.objects.order_by(F("lastname").asc(nulls_last=True))
@@ -57,23 +57,17 @@ def one_pub_house(request, slug_pub_house: str):
 
     })
 
-# class BlogDetailView(DetailView):
+# class CreateUser(CreateView):
 #     model = Users
-#     template_name = 'create.html'
-#
-#
-# class BlogCreateView(CreateView): # новое изменение
-#     model = Users
-#     template_name = 'create_one.html'
-#     fields = ['firstname', 'lastname', 'email', 'phone', 'sex', 'age']
-
+#     template_name = 'users/create.html'
+#     fields = ['firstname', 'lastname', 'email', 'phone', 'age', 'sex']
 def users_create(request):
     error = ''
     if request.method == 'POST':
         form = UsersForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('book')
+            return redirect('users')
         else:
             error = 'Заполните все поля'
     form = UsersForm()
@@ -83,19 +77,23 @@ def users_create(request):
     }
     return render(request, 'users/create.html', data)
 
-class NewUses(DetailView):
-    model = Users
-    template_name = 'users/create_one.html'
-    context_object_name = 'user'
-# def one_create(request, id: int):
-#     user = get_object_or_404(Users,id = id)
-#     return render(request, 'users/create_one.html', {
-#         'user': user
-#      })
-class NewsUpdateNew(UpdateView):
+
+def one_create(request, id: int):
+    user = get_object_or_404(Users,id = id)
+    return render(request, 'users/create_one.html', {
+        'user': user
+     })
+# class NewUser(DetailView):
+#     model = Users
+#     template_name = 'users/create_one.html'
+#     context_object_name = 'user'
+class UserUpdate(UpdateView):
     model = Users
     template_name = 'users/update_user.html'
     fields = ['firstname', 'lastname', 'email', 'phone', 'sex', 'age']
 
-
+class UserDeleteView(DeleteView):
+    model = Users
+    template_name = 'users/delete_user.html'
+    success_url = reverse_lazy('book')
 
