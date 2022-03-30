@@ -1,10 +1,11 @@
 from django.db.models import F, Avg, Count
-from django.shortcuts import render, get_object_or_404, reverse, redirect
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .forms import UsersForm
 from .models import Author, PubHouse
 from .models import Book, Users
-from .forms import UsersForm
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+
 # Create your views here.
 def all_authors(request):
     authors = Author.objects.order_by(F("lastname").asc(nulls_last=True))
@@ -57,32 +58,30 @@ def one_pub_house(request, slug_pub_house: str):
 
     })
 
+
 # class CreateUser(CreateView):
 #     model = Users
 #     template_name = 'users/create.html'
 #     fields = ['firstname', 'lastname', 'email', 'phone', 'age', 'sex']
+
 def users_create(request):
-    error = ''
-    if request.method == 'POST':
-        form = UsersForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('users')
-        else:
-            error = 'Заполните все поля'
-    form = UsersForm()
-    data = {
-        'form': form,
-        'error': error
-    }
-    return render(request, 'users/create.html', data)
+    form = UsersForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('users')
+    else:
+        context = {'form': form}
+
+    return render(request, 'users/create.html', context)
 
 
 def one_create(request, id: int):
-    user = get_object_or_404(Users,id = id)
+    user = get_object_or_404(Users, id=id)
     return render(request, 'users/create_one.html', {
         'user': user
-     })
+    })
+
+
 # class NewUser(DetailView):
 #     model = Users
 #     template_name = 'users/create_one.html'
@@ -92,8 +91,10 @@ class UserUpdate(UpdateView):
     template_name = 'users/update_user.html'
     fields = ['firstname', 'lastname', 'email', 'phone', 'sex', 'age']
 
+
 class UserDeleteView(DeleteView):
     model = Users
     template_name = 'users/delete_user.html'
     success_url = reverse_lazy('book')
 
+# удаленный пользователь если его искать, ошибка не очень красиво
