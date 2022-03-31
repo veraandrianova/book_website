@@ -9,7 +9,7 @@ from django.views.generic.edit import CreateView
 
 # Create your views here.
 def home(request):
-    return render(request,"users/home.html")
+    return render(request,"registration/home.html")
 
 
 

@@ -3,8 +3,8 @@ from django.urls import path, include
 from django.contrib import admin
 
 urlpatterns = [
-    path('', views.all_books),
-    path('', views.home, name = "home"),
+    path('', views.all_books, name='books'),
+    path('accaunts', views.home, name="home"),
     path("signup/", views.SignUp.as_view(), name="signup"),
     # path('users/', views.CreateUser.as_view(), name='new_user'),
     # path('users/', views.users_create, name='new_users'),

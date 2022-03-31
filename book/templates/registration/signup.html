@@ -4,9 +4,9 @@
 <form method="post">
     {% csrf_token %}
     {{form}}
-    <input type="submit" value="Register">
+    <input type="submit" value="Регистрация">
 </form>
 
-<a href="{% url 'login' %}">Back to login</a>
-<a href="{% url 'home' %}">Back to Home</a>
+<a href="{% url 'login' %}">Войти</a>
+<a href="{% url 'books' %}">Главная</a>
 {% endblock %}
