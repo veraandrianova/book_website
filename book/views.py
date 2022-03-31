@@ -1,12 +1,23 @@
 from django.db.models import F, Avg, Count
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .forms import UsersForm
 from .models import Author, PubHouse
-from .models import Book, Users
+from .models import Book
 from django.urls import reverse_lazy
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic.edit import CreateView
 
 # Create your views here.
+def home(request):
+    return render(request,"users/home.html")
+
+
+
+class SignUp(CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy("login")
+    template_name = "registration/signup.html"
+
 def all_authors(request):
     authors = Author.objects.order_by(F("lastname").asc(nulls_last=True))
     return render(request, 'author/all_authors.html', {
@@ -63,38 +74,38 @@ def one_pub_house(request, slug_pub_house: str):
 #     model = Users
 #     template_name = 'users/create.html'
 #     fields = ['firstname', 'lastname', 'email', 'phone', 'age', 'sex']
-
-def users_create(request):
-    form = UsersForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-        return redirect('users')
-    else:
-        context = {'form': form}
-
-    return render(request, 'users/create.html', context)
-
-
-def one_create(request, id: int):
-    user = get_object_or_404(Users, id=id)
-    return render(request, 'users/create_one.html', {
-        'user': user
-    })
+#
+# def users_create(request):
+#     form = UsersForm(request.POST or None)
+#     if form.is_valid():
+#         form.save()
+#         return redirect('users')
+#     else:
+#         context = {'form': form}
+#
+#     return render(request, 'users/create.html', context)
+#
+#
+# def one_create(request, id: int):
+#     user = get_object_or_404(Users, id=id)
+#     return render(request, 'users/create_one.html', {
+#         'user': user
+#     })
 
 
 # class NewUser(DetailView):
 #     model = Users
 #     template_name = 'users/create_one.html'
 #     context_object_name = 'user'
-class UserUpdate(UpdateView):
-    model = Users
-    template_name = 'users/update_user.html'
-    fields = ['firstname', 'lastname', 'email', 'phone', 'sex', 'age']
-
-
-class UserDeleteView(DeleteView):
-    model = Users
-    template_name = 'users/delete_user.html'
-    success_url = reverse_lazy('book')
+# class UserUpdate(UpdateView):
+#     model = Users
+#     template_name = 'users/update_user.html'
+#     fields = ['firstname', 'lastname', 'email', 'phone', 'sex', 'age']
+#
+#
+# class UserDeleteView(DeleteView):
+#     model = Users
+#     template_name = 'users/delete_user.html'
+#     success_url = reverse_lazy('book')
 
 # удаленный пользователь если его искать, ошибка не очень красиво

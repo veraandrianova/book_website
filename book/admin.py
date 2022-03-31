@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Book, Author, PubHouse, BookPlace, Users
+from .models import Book, Author, PubHouse, BookPlace
 # Register your models here.
 class RatingFilter(admin.SimpleListFilter):
     title = 'Фильтр по рейтингу'
@@ -49,15 +49,15 @@ class BookPlaceAdmin(admin.ModelAdmin):
 class AutorAdmin(admin.ModelAdmin):
     ordering = ["lastname"]
 
-class UsersAdmin(admin.ModelAdmin):
-    list_display = ['firstname', 'lastname', 'phone']
-    filter_horizontal = ['books']
+# class UsersAdmin(admin.ModelAdmin):
+#     list_display = ['firstname', 'lastname', 'phone']
+#     filter_horizontal = ['books']
 
 
 
 admin.site.register(Book, BookAdmin)
 admin.site.register(Author, AutorAdmin)
 admin.site.register(PubHouse)
-admin.site.register(Users, UsersAdmin)
+# admin.site.register(Users, UsersAdmin)
 admin.site.register(BookPlace, BookPlaceAdmin)
 

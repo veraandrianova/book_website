@@ -92,24 +92,24 @@ class Book(models.Model):
     def __str__(self):
         return f"{self.title} - {self.rating}"
 
-class Users(models.Model):
-    class Meta:
-        verbose_name = 'пользователь'
-        verbose_name_plural = 'пользователи'
-
-    SEX_CHOICES = [
-        ('male', 'Мужской'),
-        ('female', 'Женский'),
-    ]
-    firstname = models.CharField('имя', max_length=70)
-    lastname = models.CharField('фамилия',max_length=70)
-    email = models.EmailField('почта', max_length=254)
-    phone = models.CharField('телефон', max_length=13)
-    age = models.IntegerField('возраст', validators=[MinValueValidator(1),
-                                             MaxValueValidator(100)], default=18)
-    sex = models.CharField(max_length=10, choices=SEX_CHOICES, default='male', verbose_name='пол')
-    books = models.ManyToManyField(Book)
-
+# class Users(models.Model):
+#     class Meta:
+#         verbose_name = 'пользователь'
+#         verbose_name_plural = 'пользователи'
+#
+#     SEX_CHOICES = [
+#         ('male', 'Мужской'),
+#         ('female', 'Женский'),
+#     ]
+#     firstname = models.CharField('имя', max_length=70)
+#     lastname = models.CharField('фамилия',max_length=70)
+#     email = models.EmailField('почта', max_length=254)
+#     phone = models.CharField('телефон', max_length=13)
+#     age = models.IntegerField('возраст', validators=[MinValueValidator(1),
+#                                              MaxValueValidator(100)], default=18)
+#     sex = models.CharField(max_length=10, choices=SEX_CHOICES, default='male', verbose_name='пол')
+#     books = models.ManyToManyField(Book)
+#
 
     # @property
     #  def age(self):
