@@ -2,7 +2,7 @@ from django.db.models import F, Avg, Count
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
-
+from django.shortcuts import redirect
 from .forms import CustomerForm, AddBookForm
 from .models import Author, PubHouse
 from .models import Book
@@ -76,10 +76,11 @@ def addbook(request):
         form = AddBookForm(request.POST)
         if form.is_valid():
             form.save()
+            return redirect('books')
 
     else:
         form = AddBookForm()
-        return render(request, 'book/add_book.html', {
+    return render(request, 'book/add_book.html', {
             'form': form,
         })
 # def addbook(request):
