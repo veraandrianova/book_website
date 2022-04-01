@@ -3,7 +3,10 @@
 
 <form method="post">
     {% csrf_token %}
-    {{form}}
+    {% for f in form %}
+    <p><label class="'form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
+    <div class="from-error">{{ f.errors }}</div>
+    {% endfor %}
     <input type="submit" value="Регистрация">
 </form>
 

@@ -1,6 +1,9 @@
 from django.contrib import admin
-from .models import Book, Author, PubHouse, BookPlace
-# Register your models here.
+from django.contrib.auth.admin import UserAdmin
+from .models import Book, Author, PubHouse, BookPlace, Customer
+from django.utils.translation import gettext_lazy as _
+
+
 class RatingFilter(admin.SimpleListFilter):
     title = 'Фильтр по рейтингу'
     parameter_name = 'rating'
@@ -11,6 +14,7 @@ class RatingFilter(admin.SimpleListFilter):
             ('>=40 and <75', 'Средний'),
             ('>=75', 'Высокий')
         ]
+
     def queryset(self, request, queryset):
         if self.value() == '<40':
             return queryset.filter(rating__lt=40)
@@ -30,7 +34,6 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ['title']
     list_filter = [RatingFilter]
 
-
     @admin.display(ordering='rating')
     def rating_status(self, book: Book):
         if book.rating < 50:
@@ -49,10 +52,29 @@ class BookPlaceAdmin(admin.ModelAdmin):
 class AutorAdmin(admin.ModelAdmin):
     ordering = ["lastname"]
 
+
 # class UsersAdmin(admin.ModelAdmin):
 #     list_display = ['firstname', 'lastname', 'phone']
 #     filter_horizontal = ['books']
-
+@admin.register(Customer)
+class CustomerAdmin(UserAdmin):
+    fieldsets = (
+        (None, {"fields": ("username", "password")}),
+        (_("Personal info"), {"fields": ("first_name", "last_name", "age", "sex", "phone", "email")}),
+        (
+            _("Permissions"),
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+    )
 
 
 admin.site.register(Book, BookAdmin)
@@ -60,4 +82,3 @@ admin.site.register(Author, AutorAdmin)
 admin.site.register(PubHouse)
 # admin.site.register(Users, UsersAdmin)
 admin.site.register(BookPlace, BookPlaceAdmin)
-

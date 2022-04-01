@@ -1,22 +1,23 @@
 from django.db.models import F, Avg, Count
-from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+
+from .forms import CustomerForm, AddBookForm
 from .models import Author, PubHouse
 from .models import Book
-from django.urls import reverse_lazy
-from django.contrib.auth.forms import UserCreationForm
-from django.views.generic.edit import CreateView
+
 
 # Create your views here.
 def home(request):
-    return render(request,"registration/home.html")
-
+    return render(request, "registration/home.html")
 
 
 class SignUp(CreateView):
-    form_class = UserCreationForm
+    form_class = CustomerForm
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
+
 
 def all_authors(request):
     authors = Author.objects.order_by(F("lastname").asc(nulls_last=True))
@@ -70,6 +71,23 @@ def one_pub_house(request, slug_pub_house: str):
     })
 
 
+def addbook(request):
+    if request.method == 'POST':
+        form = AddBookForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+    else:
+        form = AddBookForm()
+        return render(request, 'book/add_book.html', {
+            'form': form,
+        })
+# def addbook(request):
+#     form = AddBookForm()
+#     return render(request, 'book/add_book.html', {
+#         'form': form,
+#
+#     })
 # class CreateUser(CreateView):
 #     model = Users
 #     template_name = 'users/create.html'

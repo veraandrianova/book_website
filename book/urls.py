@@ -1,6 +1,6 @@
+from django.urls import path
+
 from book import views
-from django.urls import path, include
-from django.contrib import admin
 
 urlpatterns = [
     path('', views.all_books, name='books'),
@@ -13,6 +13,7 @@ urlpatterns = [
     # path('users/<int:pk>/update', views.UserUpdate.as_view(), name='update_user'),
     # path('users/<int:pk>/delete', views.UserDeleteView.as_view(), name='delete_user'),
     path('book/<slug:slug_book>/', views.one_books, name='book_details'),
+    path('add_book/', views.addbook),
     path('author/', views.all_authors),
     path('author/<slug:slug_author>/', views.one_author, name='author_details'),
     path('pub_house/', views.all_pub_houses),

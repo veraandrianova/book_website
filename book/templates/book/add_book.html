@@ -1,0 +1,23 @@
+{% extends 'book/base.html'%}
+
+{% block title %}Регистрация{% endblock %}
+
+
+{% block content %}
+<h2>Добавление книги</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-error"> {{ form.non_field_errors ))</div>
+    {% for f in form %}
+    <p><label class="'form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
+    <div class="from-error">{{ f.errors }}</div>
+    {% endfor %}
+
+    <span>{{ error }}</span>
+
+    <button type="submit">Добавить</button>
+</form>
+
+
+{% endblock %}

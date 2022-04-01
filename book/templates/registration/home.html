@@ -13,7 +13,7 @@
     <h1>Привет, {{ user.username|default:'Guest' }}</h1>
 
     <p> Добропожаловать в нашу библиотеку</p>
-    <a href="{% url 'books' %}">Главная</a>
+    <a href="{% url 'books' %}">Библиотека</a>
 
     <div>
       {% if user.is_authenticated %}
