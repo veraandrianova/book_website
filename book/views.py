@@ -1,7 +1,8 @@
 from django.db.models import F, Avg, Count
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView
+from django.views.generic import DetailView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import redirect
 from .forms import CustomerForm, AddBookForm
 from .models import Author, PubHouse
@@ -18,6 +19,27 @@ class SignUp(CreateView):
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
 
+class NewUser(DetailView):
+    model = CustomerForm
+    template_name = 'registration/create_one.html'
+
+
+class UserUpdate(UpdateView):
+    model = CustomerForm
+    template_name = 'registration/update_user.html'
+    fields = ['firstname', 'lastname', 'email', 'phone', 'sex', 'age']
+
+
+class UserDeleteView(DeleteView):
+    model = CustomerForm
+    template_name = 'registration/delete_user.html'
+    success_url = reverse_lazy('book')
+
+
+class AddBook(CreateView):
+    form_class = AddBookForm
+    template_name = 'book/add_book.html'
+    success_url = reverse_lazy('books')
 
 def all_authors(request):
     authors = Author.objects.order_by(F("lastname").asc(nulls_last=True))
@@ -71,24 +93,7 @@ def one_pub_house(request, slug_pub_house: str):
     })
 
 
-def addbook(request):
-    if request.method == 'POST':
-        form = AddBookForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('books')
 
-    else:
-        form = AddBookForm()
-    return render(request, 'book/add_book.html', {
-            'form': form,
-        })
-# def addbook(request):
-#     form = AddBookForm()
-#     return render(request, 'book/add_book.html', {
-#         'form': form,
-#
-#     })
 # class CreateUser(CreateView):
 #     model = Users
 #     template_name = 'users/create.html'
@@ -111,20 +116,3 @@ def addbook(request):
 #         'user': user
 #     })
 
-
-# class NewUser(DetailView):
-#     model = Users
-#     template_name = 'users/create_one.html'
-#     context_object_name = 'user'
-# class UserUpdate(UpdateView):
-#     model = Users
-#     template_name = 'users/update_user.html'
-#     fields = ['firstname', 'lastname', 'email', 'phone', 'sex', 'age']
-#
-#
-# class UserDeleteView(DeleteView):
-#     model = Users
-#     template_name = 'users/delete_user.html'
-#     success_url = reverse_lazy('book')
-
-# удаленный пользователь если его искать, ошибка не очень красиво

@@ -12,10 +12,10 @@ from django.core.exceptions import ValidationError
 
 class CustomerForm(UserCreationForm):
     username = forms.CharField(label='Логин')
-    firstname = forms.CharField(label='Имя')
-    lastname = forms.CharField(label='Фамилия')
+    # firstname = forms.CharField(label='Имя')
+    # lastname = forms.CharField(label='Фамилия')
     email = forms.EmailField(label='Электронная почта')
-    phone = forms.CharField(label='Телефон')
+    # phone = forms.CharField(label='Телефон')
     password1 = forms.CharField(label='Пароль')
     password2 = forms.CharField(label='Повтор пароля')
 
@@ -23,7 +23,7 @@ class CustomerForm(UserCreationForm):
 
     class Meta:
         model = Customer
-        fields = ("username", 'firstname', 'lastname', 'email', 'phone',  'sex', 'age')
+        fields = ("username", 'email')
         field_classes = {"username": UsernameField}
 
 
