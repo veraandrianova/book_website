@@ -18,9 +18,13 @@ from django.urls import path, include
 from django.contrib import admin
 from django.urls import path,include
 
+from book.views import pageNotFound
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('book.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('home/', include('book.urls')),
+    path('captcha/', include('captcha.urls'))
 ]
+hadler404 = pageNotFound

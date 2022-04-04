@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'book',
     'django_extensions',
+    'captcha',
+
 
 ]
 

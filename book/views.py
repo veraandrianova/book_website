@@ -1,16 +1,21 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import ValidationError
 from django.db.models import F, Avg, Count
+from django.http import HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import redirect
-from .forms import CustomerForm, AddBookForm
+from .forms import CustomerForm, AddBookForm, CustomerUpdateForm
 from .models import Author, PubHouse
 from .models import Book, Customer
 
 
 # Create your views here.
+def pageNotFound(request,exception):
+    return HttpResponseNotFound('<h1> Страница не найдена</h1>')
+
 def home(request):
     return render(request, "registration/home.html")
 
@@ -19,6 +24,8 @@ class SignUp(CreateView):
     form_class = CustomerForm
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
+
+
 
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
@@ -31,6 +38,21 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
     def get_object(self, *args, **kwargs):
         return self.request.user
 
+
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if not phone[1:].isdigit():
+            raise ValidationError('Поле должно быть формата +79876543211')
+        if phone[0] != '+':
+            raise ValidationError('Поле должно быть формата +79876543211')
+        if len(phone) != 12:
+            raise ValidationError('Поле должно быть формата +79876543211')
+        return phone
+
+class ProfileDeleteView(LoginRequiredMixin, DeleteView):
+    model = Customer
+    template_name = 'registration/delete_user.html'
+    success_url = reverse_lazy('books')
 
 class AddBook(CreateView):
     form_class = AddBookForm
