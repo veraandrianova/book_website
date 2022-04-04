@@ -109,4 +109,4 @@ class Customer(AbstractUser):
 
 
     def get_absolute_url(self):
-        return reverse('one_user', args=[str(self.id)])
+        return reverse('user_detail', args=[str(self.id)])

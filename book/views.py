@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, Avg, Count
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
@@ -6,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import redirect
 from .forms import CustomerForm, AddBookForm
 from .models import Author, PubHouse
-from .models import Book
+from .models import Book, Customer
 
 
 # Create your views here.
@@ -19,27 +20,24 @@ class SignUp(CreateView):
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
 
-class NewUser(DetailView):
-    model = CustomerForm
+
+class ProfileEditView(LoginRequiredMixin, UpdateView):
+    model = Customer
     template_name = 'registration/create_one.html'
+    fields = ['email', 'phone', 'age', 'sex']
+    login_url='login'
+    success_url = reverse_lazy('home')
 
-
-class UserUpdate(UpdateView):
-    model = CustomerForm
-    template_name = 'registration/update_user.html'
-    fields = ['firstname', 'lastname', 'email', 'phone', 'sex', 'age']
-
-
-class UserDeleteView(DeleteView):
-    model = CustomerForm
-    template_name = 'registration/delete_user.html'
-    success_url = reverse_lazy('book')
+    def get_object(self, *args, **kwargs):
+        return self.request.user
 
 
 class AddBook(CreateView):
     form_class = AddBookForm
     template_name = 'book/add_book.html'
     success_url = reverse_lazy('books')
+
+
 
 def all_authors(request):
     authors = Author.objects.order_by(F("lastname").asc(nulls_last=True))
