@@ -5,28 +5,34 @@
 
 
 {% block content %}
-     <h2>Список всех книг</h2>
-     <ul>
-          {% for book in books %}
-              <li><a href="{{ book.get_url }}">{{book.title}}</a></li>
-          {% endfor %}
-     </ul>
-     <h3>Средний рейтинг - {{ agg.rating__avg }}</h3>
-     <h3>Всего книг - {{ agg.id__count }} </h3>
-     <nav>
-          <a href="/add_book">Добавить книгу</a>
-     </nav>
-     <nav>
-          <a href="/author">Авторы</a>
-     </nav>
-     <nav>
-          <a href="/pub_house">Издания</a>
-     </nav>
-     <nav>
-          <a href="/accounts/login">Войти</a>
-     </nav>
-     <nav>
-          <a href="/home/signup/">Регистрация</a>
-     </nav>
+<ul class="list-articles">
+     {% for book in books %}
+              <li><h2>{{book.title}}</h2>
+     {% autoescape on %}
+     {{book.description}}
+     {% endautoescape %}
+              <div class="clear"</div>
+              <p class="link-read-post><a href="{% url 'book_details' book.slug %}">Читать</a></p>
+              </li>
+     {% endfor %}
+
+<!--     <h3>Средний рейтинг - {{ agg.rating__avg }}</h3>-->
+<!--     <h3>Всего книг - {{ agg.id__count }} </h3>-->
+<!--     <nav>-->
+<!--          <a href="/add_book">Добавить книгу</a>-->
+<!--     </nav>-->
+<!--     <nav>-->
+<!--          <a href="/author">Авторы</a>-->
+<!--     </nav>-->
+<!--     <nav>-->
+<!--          <a href="/pub_house">Издания</a>-->
+<!--     </nav>-->
+<!--     <nav>-->
+<!--          <a href="/accounts/login">Войти</a>-->
+<!--     </nav>-->
+<!--     <nav>-->
+<!--          <a href="/home/signup/">Регистрация</a>-->
+<!--     </nav>-->
+</ul>
 {% endblock %}
 

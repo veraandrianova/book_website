@@ -13,6 +13,7 @@ class Author(models.Model):
 
     firstname = models.CharField('имя', max_length=70)
     lastname = models.CharField('фамилия', max_length=70)
+    image = models.ImageField("Постер", upload_to="movies/", blank=True)
     description = models.TextField("Описание", blank=True)
     slug = models.SlugField(default='', null=False, blank=True)
     name = models.CharField(max_length=70, blank=True)
@@ -75,10 +76,12 @@ class Book(models.Model):
 
     title = models.CharField('название', max_length=70)
     description = models.TextField("Описание", blank=True)
+    image = models.ImageField("Постер", upload_to="photos/", blank=True)
     rating = models.IntegerField('Рейтинг', validators=[MinValueValidator(1),
                                                         MaxValueValidator(100)], blank=True)
     is_best_selling = models.BooleanField(null=True, blank=True)
     slug = models.SlugField(default='', null=False)
+    is_published = models.BooleanField(default=True)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True)
     cover = models.CharField('переплет', max_length=10, choices=COVER_CHOICES, default='solid')
     pub_house = models.ManyToManyField(PubHouse)

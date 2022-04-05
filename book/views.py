@@ -13,6 +13,12 @@ from .models import Book, Customer
 
 
 # Create your views here.
+menu = [{'title': "Добавить книгу", 'url_name': "add_book"},
+        {'title': "Войти", 'url_name': "login"},
+        {'title': "Регистрация", 'url_name': "signup"}
+]
+
+
 def pageNotFound(request,exception):
     return HttpResponseNotFound('<h1> Страница не найдена</h1>')
 
@@ -65,6 +71,7 @@ def all_authors(request):
     authors = Author.objects.order_by(F("lastname").asc(nulls_last=True))
     return render(request, 'author/all_authors.html', {
         'authors': authors,
+        'menu': menu
 
     })
 
@@ -82,7 +89,8 @@ def all_books(request):
     agg = books.aggregate(Avg('rating'), Count('id'))
     return render(request, 'book/all_books.html', {
         'books': books,
-        'agg': agg
+        'agg': agg,
+        'menu': menu
 
     })
 
@@ -101,6 +109,7 @@ def all_pub_houses(request):
     return render(request, 'pub_house/all_pub_houses.html', {
         'pub_houses': pub_houses,
         'agg_house': agg_house,
+        'menu': menu
 
     })
 

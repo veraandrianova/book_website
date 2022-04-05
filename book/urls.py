@@ -13,8 +13,8 @@ urlpatterns = [
     path('users/<int:pk>/delete', views.ProfileDeleteView.as_view(), name='delete_user'),
     path('users/<int:pk>/update', views.ProfileEditView.as_view(), name='update_user'),
     path('book/<slug:slug_book>/', views.one_books, name='book_details'),
-    path('author/', views.all_authors),
+    path('author/', views.all_authors, name='author'),
     path('author/<slug:slug_author>/', views.one_author, name='author_details'),
-    path('pub_house/', views.all_pub_houses),
+    path('pub_house/', views.all_pub_houses, name='pub_house'),
     path('pub_house/<slug:slug_pub_house>/', views.one_pub_house, name='pub_house_details'),
 ]

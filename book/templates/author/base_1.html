@@ -1,12 +1,50 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html
 <head>
-    <meta charset="UTF-8">
     <title>{% block title %} {% endblock %}</title>
+    <link type="text/css" href="{% static 'book/css/styles.css' %}" rel="stylesheet" />
+    <meta http-equiv="Content-Type" content="text/html"; charset="UTF-8">
+    <link rel="shortcut icon" href="{% static 'book/images/main.ico' %}" type="image/x-icon" />
+    <meta name="view-port" content="width=device-width", initial-scale=1.0>
 </head>
 <body>
-{% block content %}
+<table class="table-page" border=0 cellpadding="0" cellspacing="0">
+<tr><td valign=top>
+{% block mainmenu %}
+        <div class="header">
+            <ul id="mainmenu" class="mainmenu">
+            <li class="logo"><a href="{% url 'books' %}"><div class="logo"></div></a></li>
+{% for m in menu %}
+    {% if not forloop.last %}
+           <li><a href="{% url m.url_name %}"> {{m.title}}</a></li>
+    {% else %}
+           <li class="last"><a href="{% url m.url_name %}"> {{m.title}}</a></li>
+    {% endif %}
+{% endfor %}
+            </ul>
+            <div class="clear"></div>
+        </div>
+{% endblock mainmenu %}
+<table class="table-content" border=0 cellpadding="0" cellspacing="0">
+<tr>
+    <td valign="top" class="left-chapters">
+    <ul id="left-chapters">
+        <li class="selected">Библиотека</li>
+        <li><a href="{% url 'books' %}">Книги</a></li>
+        <li><a href="{% url 'author' %}">Авторы</a></li>
+        <li><a href="{% url 'pub_house' %}">Издательства</a></li>
 
+    </ul>
+    </td>
+<td valign="top" class="content">
+    {% block breadcrumbs %}
+    {% endblock %}
+
+    <div class="content-text">
+{% block content %}
 {% endblock %}
+    </div>
+</td></tr></table>
 </body>
 </html>

@@ -5,12 +5,16 @@
 
 
 {% block content %}
-     <h2>Список всех авторов</h2>
-     <ul>
-          {% for author in authors %}
-              <li><a href="{{ author.get_url }}">{{author.name}}</a></li>
-          {% endfor %}
-     </ul>
-
+<ul class="list-articles">
+     {% for author in authors %}
+              <li><h2>{{author.name}}</h2>
+     {% autoescape on %}
+     {{author.description}}
+     {% endautoescape %}
+              <div class="clear"</div>
+              <p class="link-read-post><a href="{% url 'author_details' author.slug %}">Читать</a></p>
+              </li>
+     {% endfor %}
+    
 {% endblock %}
 
