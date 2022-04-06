@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.urls import reverse
@@ -113,3 +114,14 @@ class Customer(AbstractUser):
 
     def get_absolute_url(self):
         return reverse('user_detail', args=[str(self.id)])
+
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if not phone[1:].isdigit():
+            raise ValidationError('Поле должно быть формата +79876543211')
+        if phone[0] != '+':
+            raise ValidationError('Поле должно быть формата +79876543211')
+        if len(phone) != 12:
+            raise ValidationError('Поле должно быть формата +79876543211')
+        return phone
+

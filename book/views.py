@@ -1,3 +1,4 @@
+from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView
 from django.core.exceptions import ValidationError
@@ -38,6 +39,11 @@ class LoginUser(LoginView):
 
     def get_success_url(self):
         return reverse_lazy('home')
+
+def logout_user(request):
+    logout(request)
+    return redirect('login')
+
 
 class SignUp(CreateView):
     form_class = CustomerForm

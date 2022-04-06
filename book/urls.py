@@ -9,6 +9,7 @@ urlpatterns = [
     path("signup/", views.SignUp.as_view(), name="signup"),
     path('add_book/', views.AddBook.as_view(), name="add_book"),
     path('login/', LoginUser.as_view(), name='login'),
+    path('logout/', LoginUser.as_view(), name='logout'),
     # path('users/', views.CreateUser.as_view(), name='new_user'),
     # path('users/', views.users_create, name='new_users'),
     # path('users/<int:id>/', views.one_create, name='one_user'),
