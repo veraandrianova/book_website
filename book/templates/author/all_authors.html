@@ -7,12 +7,17 @@
 {% block content %}
 <ul class="list-articles">
      {% for author in authors %}
-              <li><h2>{{author.name}}</h2>
+              <li>
+              <li>
+{% if author.image %}
+                  <p><img class="imd-article-left thumd" src="{{author.image.url}}"></p>
+{% endif %}
+                  <h2>{{author.name}}</h2>
      {% autoescape on %}
      {{author.description}}
      {% endautoescape %}
               <div class="clear"</div>
-              <p class="link-read-post><a href="{% url 'author_details' author.slug %}">Читать</a></p>
+              <p class="link-read-post"><a href="{% url 'author_details' author.slug %}">Читать</a></p>
               </li>
      {% endfor %}
     

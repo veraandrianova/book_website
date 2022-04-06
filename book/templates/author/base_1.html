@@ -44,6 +44,35 @@
     <div class="content-text">
 {% block content %}
 {% endblock %}
+{% if page_obj.has_other_pages %}
+<nav class="list-pages">
+    <ul>
+{% if page_obj.has_previous %}
+<li class="page-num"
+    <a href="?page={{ page_obj.previous_page_number }}">&lt;</a>
+</li>
+{% endif %}
+{% endif %}
+        {% for author in paginator.page_range %}
+        {% if page_obj.number == author %}
+        <li class="page-num page-num-selected">{{ author }}</li>
+        {% elif author >= page_obj.number|add:-2 and author <= page_obj.number|add:2 %}
+        <li class="page-num">
+            <a href="?page={{ author }}">{{ author }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+{% if page_obj.has_next %}
+<nav class="list-pages">
+    <ul>
+{% if page_obj.has_previous %}
+<li class="page-num"
+    <a href="?page={{ page_obj.nex_page_number }}">&gt;</a>
+</li>
+{% endif %}
+    </ul>
+</nav>
+{% endif %}
     </div>
 </td></tr></table>
 </body>

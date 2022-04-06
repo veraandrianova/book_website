@@ -7,12 +7,16 @@
 {% block content %}
 <ul class="list-articles">
      {% for book in books %}
-              <li><h2>{{book.title}}</h2>
+              <li>
+{% if book.image %}
+                  <p><img class="imd-article-left thumd" src="{{book.image.url}}"></p>
+{% endif %}
+                  <h2>{{book.title}}</h2>
      {% autoescape on %}
      {{book.description}}
      {% endautoescape %}
               <div class="clear"</div>
-              <p class="link-read-post><a href="{% url 'book_details' book.slug %}">Читать</a></p>
+              <p class="link-read-post"><a href="{% url 'book_details' book.slug %}">Читать</a></p>
               </li>
      {% endfor %}
 

@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.db.models import F, Avg, Count
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
@@ -68,10 +69,15 @@ class AddBook(CreateView):
 
 
 def all_authors(request):
+    contact_list = Author.objects.all()
+    paginator = Paginator(contact_list, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     authors = Author.objects.order_by(F("lastname").asc(nulls_last=True))
     return render(request, 'author/all_authors.html', {
         'authors': authors,
-        'menu': menu
+        'menu': menu,
+        'page_obj': page_obj
 
     })
 
@@ -85,6 +91,10 @@ def one_author(request, slug_author: str):
 
 
 def all_books(request):
+    contact_list = Book.objects.all()
+    paginator = Paginator(contact_list, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     books = Book.objects.order_by(F("rating").asc(nulls_last=True))
     agg = books.aggregate(Avg('rating'), Count('id'))
     return render(request, 'book/all_books.html', {

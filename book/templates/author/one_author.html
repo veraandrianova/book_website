@@ -6,6 +6,9 @@
 
 {% block content %}
      <h3>Информация об авторе</h3>
+     <h3> {% if author.image %}
+                  <p><img class="imd-article-left thumd" src="{{author.image.url}}"></p>
+          {% endif %}</h3>
      <h3>Имя - {{ author.firstname }}</h3>
      <h3>Фамилия - {{ author.lastname  }}</h3>
      <h3>Почта - {{ author.description }}</h3>

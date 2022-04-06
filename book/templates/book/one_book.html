@@ -6,6 +6,8 @@
 
 {% block content %}
      <h2>Информация о книге - {{ book.title }}</h2>
+     <h3>{% if book.image %}
+                  <p><img class="imd-article-left thumd" src="{{book.image.url}}"></p>{% endif %}</h3>
      <h3>Описание - {{ book.description }}</h3>
      <h3>Автор - {{ book.author }}</h3>
      <h3>Рейтинг - {{ book.rating }}</h3>
