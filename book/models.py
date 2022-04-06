@@ -91,8 +91,8 @@ class Book(models.Model):
         self.slug = slugify(translit(self.title, 'ru', reversed=True))
         super(Book, self).save(*args, **kwargs)
 
-    def get_url(self):
-        return reverse('book_details', args=[self.slug])
+    def get_absolute_url(self):
+        return reverse('book_details', kwargs={'slug_book': self.slug})
 
     def __str__(self):
         return f"{self.title} - {self.rating}"

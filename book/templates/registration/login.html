@@ -1,5 +1,5 @@
 {% extends 'registration/base_3.html'%}
-{% block title %}{% endblock %}
+{% block title %}Войти{% endblock %}
 
 {% block content %}
 
@@ -8,7 +8,7 @@
     <form method="post">
       {% csrf_token %}
       <table>
-        {{ form.as_p }}
+      {{ form.as_p }}
         <tr>
           <td>&nbsp;</td>
           <td><input type="submit" value="Войти"></td>

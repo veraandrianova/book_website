@@ -1,4 +1,4 @@
-from django.contrib.auth.forms import UserCreationForm, UsernameField
+from django.contrib.auth.forms import UserCreationForm, UsernameField, AuthenticationForm
 from django.core.exceptions import ValidationError
 from captcha.fields import CaptchaField
 from .models import Customer, Book
@@ -68,3 +68,8 @@ class CustomerUpdateForm(UserCreationForm):
         if len(phone) != 12:
             raise ValidationError('Поле должно быть формата +79876543211')
         return phone
+
+
+class LoginUserForm(AuthenticationForm):
+    username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
+    password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))

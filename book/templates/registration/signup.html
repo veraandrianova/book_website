@@ -1,4 +1,5 @@
 {% extends 'registration/base_3.html'%}
+{% block title %}Регистрация{% endblock %}
 {% block content %}
 <h2>Регистрация</h2>
 
@@ -11,6 +12,4 @@
     <input type="submit" value="Регистрация">
 </form>
 
-<a href="{% url 'login' %}">Войти</a>
-<a href="{% url 'books' %}">Главная</a>
 {% endblock %}
