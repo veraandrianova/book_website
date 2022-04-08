@@ -1,4 +1,4 @@
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseNotFound
@@ -22,10 +22,6 @@ def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1> Страница не найдена</h1>')
 
 
-def home(request):
-    return render(request, "registration/home.html")
-
-
 class LoginUser(LoginView):
     form_class = LoginUserForm
     template_name = "registration/login.html"
@@ -42,7 +38,7 @@ class LoginUser(LoginView):
 
 def logout_user(request):
     logout(request)
-    return redirect('login')
+    return redirect('books')
 
 
 class SignUp(CreateView):
@@ -55,6 +51,11 @@ class SignUp(CreateView):
         context['menu'] = menu
         return context
 
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('home')
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = Customer
@@ -108,11 +109,6 @@ class BookEditView(LoginRequiredMixin, UpdateView):
         return context
 
 
-    def form_valid(self, form):
-        book = form.save(commit=False)
-        book.creator = self.request.book
-        book.save()
-        return super().form_valid(form)
 
 
 

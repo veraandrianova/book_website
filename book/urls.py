@@ -1,7 +1,7 @@
 from django.urls import path
 
 from book import views
-from book.views import LoginUser, BookEditView
+from book.views import LoginUser
 
 urlpatterns = [
     path('', views.BookAll.as_view(), name='books'),
