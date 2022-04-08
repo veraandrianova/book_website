@@ -1,9 +1,8 @@
-{% extends 'registration/base_3.html'%}
-
+{% extends 'book/base.html'%}
 {% block content %}
-    <h1>Удалить пользователя</h1>
+    <h1>Удалить книгу</h1>
     <form action="" method="post">{% csrf_token %}
-      <p>Удалить профиль ?</p>
+      <p>Удалить книгу ?</p>
       <input type="submit" value="Удалить" />
     </form>
 {% endblock content %}

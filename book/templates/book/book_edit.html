@@ -1,0 +1,10 @@
+{% extends 'book/base.html'%}
+
+{% block title %}Редактирование книги  - {{ book.title }}{% endblock %}
+{% block content %}
+    <h1>Редактирование книги</h1>
+    <form action="" method="post">{% csrf_token %}
+      {{ form.as_p }}
+    <input type="submit" value="Update" />
+</form>
+{% endblock content %}

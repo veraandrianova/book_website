@@ -1,28 +1,26 @@
 from django.contrib.auth import logout
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator
-from django.db.models import F, Avg, Count
 from django.http import HttpResponseNotFound
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse_lazy
+from django.shortcuts import redirect
+from django.shortcuts import render
+from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.shortcuts import redirect
-from .forms import CustomerForm, AddBookForm, CustomerUpdateForm, LoginUserForm
+
+from .forms import CustomerForm, AddBookForm, LoginUserForm, CustomerEditForm, BookEditForm
 from .models import Author, PubHouse
 from .models import Book, Customer
-from django.core.paginator import Paginator
 
 # Create your views here.
 menu = [{'title': "Добавить книгу", 'url_name': "add_book"},
 
-]
+        ]
 
 
-def pageNotFound(request,exception):
+def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1> Страница не найдена</h1>')
+
 
 def home(request):
     return render(request, "registration/home.html")
@@ -38,7 +36,9 @@ class LoginUser(LoginView):
         return context
 
     def get_success_url(self):
-        return reverse_lazy('home')
+        user_id = self.request.user.id
+        return reverse('update_user', kwargs={'pk': user_id})
+
 
 def logout_user(request):
     logout(request)
@@ -56,30 +56,15 @@ class SignUp(CreateView):
         return context
 
 
-
-
-
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = Customer
     template_name = 'registration/create_one.html'
-    fields = ['email', 'phone', 'age', 'sex']
-    login_url='login'
-    success_url = reverse_lazy('home')
+    form_class = CustomerEditForm
+    login_url = 'login'
+    success_url = reverse_lazy('books')
 
-    def get_object(self, *args, **kwargs):
-        return self.request.user
-
-
-    def clean_phone(self):
-        phone = self.cleaned_data['phone']
-        if not phone[1:].isdigit():
-            raise ValidationError('Поле должно быть формата +79876543211')
-        if phone[0] != '+':
-            raise ValidationError('Поле должно быть формата +79876543211')
-        if len(phone) != 12:
-            raise ValidationError('Поле должно быть формата +79876543211')
-        return phone
-
+    # def get_object(self, *args, **kwargs):
+    #     return self.request.user
 
 
 class ProfileDeleteView(LoginRequiredMixin, DeleteView):
@@ -89,10 +74,20 @@ class ProfileDeleteView(LoginRequiredMixin, DeleteView):
 
 
 
-class AddBook(CreateView):
+class AddBook(LoginRequiredMixin, CreateView):
     form_class = AddBookForm
     template_name = 'book/add_book.html'
-    # success_url = reverse_lazy('books')
+
+
+    def get_object(self, *args, **kwargs):
+         return self.request.user
+
+
+    def form_valid(self, form):
+        book = form.save(commit=False)
+        book.creator = self.request.user
+        book.save()
+        return super().form_valid(form)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -100,6 +95,32 @@ class AddBook(CreateView):
         return context
 
 
+class BookEditView(LoginRequiredMixin, UpdateView):
+    model = Book
+    template_name = 'book/book_edit.html'
+    form_class = BookEditForm
+    success_url = reverse_lazy('books')
+    slug_url_kwarg = 'slug_book'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        return context
+
+
+    def form_valid(self, form):
+        book = form.save(commit=False)
+        book.creator = self.request.book
+        book.save()
+        return super().form_valid(form)
+
+
+
+class BookDeleteView(LoginRequiredMixin, DeleteView):
+    model = Book
+    template_name = 'book/delete_book.html'
+    success_url = reverse_lazy('books')
+    slug_url_kwarg = 'slug_book'
 
 class AuthorAll(ListView):
     paginate_by = 3
@@ -107,7 +128,6 @@ class AuthorAll(ListView):
     template_name = "author/all_authors.html"
     context_object_name = "authors"
     allow_empty = False
-
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -140,6 +160,7 @@ class ShowAuthor(DetailView):
         context['authors_selected'] = 0
         return context
 
+
 # def one_author(request, slug_author: str):
 #     author = get_object_or_404(Author, slug=slug_author)
 #     return render(request, 'author/one_author.html', {
@@ -153,7 +174,6 @@ class BookAll(ListView):
     template_name = "book/all_books.html"
     context_object_name = "books"
     allow_empty = False
-
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -206,12 +226,12 @@ class PubHouseAll(ListView):
     context_object_name = "pub_houses"
     allow_empty = False
 
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
         context['pub_houses_selected'] = 0
         return context
+
 
 # def all_pub_houses(request):
 #     pub_houses = PubHouse.objects.order_by(F("name_house").asc(nulls_last=True))
@@ -244,7 +264,6 @@ class ShowPubHouse(DetailView):
 #     })
 
 
-
 # class CreateUser(CreateView):
 #     model = Users
 #     template_name = 'users/create.html'
@@ -266,4 +285,3 @@ class ShowPubHouse(DetailView):
 #     return render(request, 'users/create_one.html', {
 #         'user': user
 #     })
-

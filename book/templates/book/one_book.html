@@ -20,4 +20,6 @@
      <ul> {% for pub_houses in  book.pub_house.all %} </ul>
               <li>{{ pub_houses }}</li>
           {% endfor %}
+<a href="{% url 'book_edit' book.slug %}">Редактировать книгу</a>
+<a href="{% url 'book_delete' book.slug %}">Удалить книгу</a>
 {% endblock %}

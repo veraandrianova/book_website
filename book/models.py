@@ -1,10 +1,14 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from transliterate import translit
+
+from .validators import phone_validator
+
+# User = get_user_model()
 
 
 class Author(models.Model):
@@ -83,10 +87,11 @@ class Book(models.Model):
     is_best_selling = models.BooleanField(null=True, blank=True)
     slug = models.SlugField(default='', null=False)
     is_published = models.BooleanField(default=True)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True, verbose_name='автор')
     cover = models.CharField('переплет', max_length=10, choices=COVER_CHOICES, default='solid')
     pub_house = models.ManyToManyField(PubHouse)
     book_place = models.OneToOneField(BookPlace, on_delete=models.SET_NULL, null=True, blank=True)
+    creator = models.ForeignKey('Customer', on_delete=models.CASCADE, default=1, verbose_name='создатель')
 
     def save(self, *args, **kwargs):
         self.slug = slugify(translit(self.title, 'ru', reversed=True))
@@ -101,27 +106,15 @@ class Book(models.Model):
 
 class Customer(AbstractUser):
     SEX_CHOICES = [
-            ('male', 'Мужской'),
-            ('female', 'Женский'),
-        ]
+        ('male', 'Мужской'),
+        ('female', 'Женский'),
+    ]
 
-    phone = models.CharField('телефон', validators=[], max_length=13)
+    phone = models.CharField('телефон', validators=[phone_validator], max_length=13)
     age = models.IntegerField('возраст', validators=[MinValueValidator(1),
                                                      MaxValueValidator(100)], default=18)
     sex = models.CharField(max_length=10, choices=SEX_CHOICES, default='male', verbose_name='пол')
 
-
-
     def get_absolute_url(self):
         return reverse('user_detail', args=[str(self.id)])
-
-    def clean_phone(self):
-        phone = self.cleaned_data['phone']
-        if not phone[1:].isdigit():
-            raise ValidationError('Поле должно быть формата +79876543211')
-        if phone[0] != '+':
-            raise ValidationError('Поле должно быть формата +79876543211')
-        if len(phone) != 12:
-            raise ValidationError('Поле должно быть формата +79876543211')
-        return phone
 
