@@ -38,7 +38,7 @@ class LoginUser(LoginView):
 
 def logout_user(request):
     logout(request)
-    return redirect('books')
+    return redirect('login')
 
 
 class SignUp(CreateView):
@@ -55,7 +55,7 @@ class SignUp(CreateView):
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
-        return redirect('home')
+        return redirect('login')
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = Customer
