@@ -20,6 +20,10 @@
      <ul> {% for pub_houses in  book.pub_house.all %} </ul>
               <li>{{ pub_houses }}</li>
           {% endfor %}
+{% if request.user == book.creator %}
 <a href="{% url 'book_edit' book.slug %}">Редактировать книгу</a>
+{% endif %}
+{% if request.user == book.creator %}
 <a href="{% url 'book_delete' book.slug %}">Удалить книгу</a>
+{% endif %}
 {% endblock %}

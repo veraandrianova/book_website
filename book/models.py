@@ -83,13 +83,13 @@ class Book(models.Model):
     description = models.TextField("Описание", blank=True)
     image = models.ImageField("Постер", upload_to="photos/", blank=True)
     rating = models.IntegerField('Рейтинг', validators=[MinValueValidator(1),
-                                                        MaxValueValidator(100)], blank=True)
+                                                        MaxValueValidator(100)], blank=True, null=True)
     is_best_selling = models.BooleanField(null=True, blank=True)
     slug = models.SlugField(default='', null=False)
     is_published = models.BooleanField(default=True)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True, verbose_name='автор')
     cover = models.CharField('переплет', max_length=10, choices=COVER_CHOICES, default='solid')
-    pub_house = models.ManyToManyField(PubHouse)
+    pub_house = models.ManyToManyField(PubHouse, verbose_name='издательство')
     book_place = models.OneToOneField(BookPlace, on_delete=models.SET_NULL, null=True, blank=True)
     creator = models.ForeignKey('Customer', on_delete=models.CASCADE, default=1, verbose_name='создатель')
 

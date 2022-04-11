@@ -45,7 +45,7 @@ class CustomerEditForm(forms.ModelForm):
 class AddBookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ['title', 'rating', 'description', 'author']
+        fields = ['title', 'rating', 'description', 'author', 'pub_house']
 
 class BookEditForm(forms.ModelForm):
     class Meta:

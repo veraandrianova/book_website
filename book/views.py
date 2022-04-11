@@ -1,9 +1,9 @@
 from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.http import HttpResponseNotFound
+from django.core.checks import messages
+from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import redirect
-from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -51,11 +51,11 @@ class SignUp(CreateView):
         context['menu'] = menu
         return context
 
-
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
         return redirect('login')
+
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = Customer
@@ -74,15 +74,12 @@ class ProfileDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('books')
 
 
-
 class AddBook(LoginRequiredMixin, CreateView):
     form_class = AddBookForm
     template_name = 'book/add_book.html'
 
-
     def get_object(self, *args, **kwargs):
-         return self.request.user
-
+        return self.request.user
 
     def form_valid(self, form):
         book = form.save(commit=False)
@@ -104,12 +101,16 @@ class BookEditView(LoginRequiredMixin, UpdateView):
     slug_url_kwarg = 'slug_book'
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        kwargs['update'] = True
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
         return context
 
-
-
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if self.request.user != kwargs['instance'].creator:
+            return self.handle_no_permission()
+        return kwargs
 
 
 class BookDeleteView(LoginRequiredMixin, DeleteView):
@@ -117,6 +118,23 @@ class BookDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'book/delete_book.html'
     success_url = reverse_lazy('books')
     slug_url_kwarg = 'slug_book'
+
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        return context
+
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        if self.request.user != self.object.creator:
+            return self.handle_no_permission()
+        self.object.delete()
+        return HttpResponseRedirect(success_url)
+
+
 
 class AuthorAll(ListView):
     paginate_by = 3
@@ -169,7 +187,7 @@ class BookAll(ListView):
     model = Book
     template_name = "book/all_books.html"
     context_object_name = "books"
-    allow_empty = False
+
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
