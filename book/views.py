@@ -2,6 +2,7 @@ from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.core.checks import messages
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
@@ -128,7 +129,7 @@ class BookDeleteView(LoginRequiredMixin, DeleteView):
 
 
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
+        self.book = self.get_object()
         success_url = self.get_success_url()
         if self.request.user != self.object.creator:
             return self.handle_no_permission()
@@ -231,12 +232,6 @@ class ShowBook(FormMixin, DetailView):
         context['books_selected'] = 0
         return context
 
-    # def form_valid(self, form):
-    #     book = form.save(commit=False)
-    #     # self.object.book = self.get_object()
-    #     book.creator = self.request.user
-    #     book.save()
-    #     return super().form_valid(form)
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -249,9 +244,19 @@ class ShowBook(FormMixin, DetailView):
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.book = self.get_object()
+        self.success_url = self.get_success_url()
         self.object.creator = self.request.user
         self.object.save()
+        # return HttpResponseRedirect(self.get_success_url())
         return super().form_valid(form)
+    # def form_valid(self, form):
+    #     self.object = form.save(commit=False)
+    #     self.object.book = self.get_object()
+    #     self.success_url = self.get_success_url()
+    #     if self.object.creator != self.request.user:
+    #         return redirect('login')
+    #     self.object.save()
+    #     return super().form_valid(form)
 
 
 # def one_books(request, slug_book: str):
