@@ -2,8 +2,8 @@ from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UsernameField, AuthenticationForm
 from django.core.exceptions import ValidationError
-
-from .models import Customer, Book
+from django.forms import Textarea
+from .models import Customer, Book, Comment
 
 
 class CustomerForm(UserCreationForm):
@@ -63,3 +63,13 @@ class BookEditForm(forms.ModelForm):
 class LoginUserForm(AuthenticationForm):
     username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
+
+
+
+class RewiewForm(forms.ModelForm):
+    body = forms.CharField(label='', widget=Textarea(attrs={'rows': 5}))
+
+
+    class Meta:
+        model = Comment
+        fields = ["body"]

@@ -23,7 +23,28 @@
 {% if request.user == book.creator %}
 <a href="{% url 'book_edit' book.slug %}">Редактировать книгу</a>
 {% endif %}
-{% if request.user == book.creator %}
+
 <a href="{% url 'book_delete' book.slug %}">Удалить книгу</a>
-{% endif %}
+
+<p>Комментарии</p>
+<ul>
+{% for item in book.comment_book.all %}
+<li>
+Дата создания: {{item.created}} <br>
+Автор: {{item.creator}} <br><br>
+{{item.body}} <br>
+</li>
+{% endfor %}
+</ul>
+<hr>
+<p>Добавить комментарии</p>
+<div class="col-4">
+    <form action="" id="add_form" method="post">
+        {% csrf_token %}
+            {{form.as_p}}
+    </form>
+     <button form="add_form" type="submit" class="btn.btn-primary">Добавить</button>
+</div>
+
+
 {% endblock %}

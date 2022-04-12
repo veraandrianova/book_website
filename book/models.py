@@ -118,3 +118,19 @@ class Customer(AbstractUser):
     def get_absolute_url(self):
         return reverse('user_detail', args=[str(self.id)])
 
+
+class Comment(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comment_book')
+    creator = models.ForeignKey('Customer', on_delete=models.CASCADE, default=1, verbose_name='автор комментария')
+    body = models.TextField('текст')
+    created = models.DateTimeField('создано',auto_now_add=True)
+    updated = models.DateTimeField('измененно', auto_now=True)
+    active = models.BooleanField('активность', default=True)
+
+    class Meta:
+        verbose_name = 'комментрарий'
+        verbose_name_plural = 'комментарии'
+        ordering = ('created',)
+
+    def __str__(self):
+        return 'Comment by {} on {}'.format(self.creator, self.book)

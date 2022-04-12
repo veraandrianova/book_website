@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Book, Author, PubHouse, BookPlace, Customer
+from .models import Book, Author, PubHouse, BookPlace, Customer, Comment
 from django.utils.translation import gettext_lazy as _
 
 
@@ -77,8 +77,14 @@ class CustomerAdmin(UserAdmin):
     )
 
 
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('creator', 'book', 'created', 'active')
+    list_filter = ('active', 'created', 'updated')
+    search_fields = ('creator', 'body')
+
+
 admin.site.register(Book, BookAdmin)
 admin.site.register(Author, AutorAdmin)
 admin.site.register(PubHouse)
-# admin.site.register(Users, UsersAdmin)
 admin.site.register(BookPlace, BookPlaceAdmin)

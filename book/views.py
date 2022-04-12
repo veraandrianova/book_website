@@ -2,13 +2,14 @@ from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.core.checks import messages
-from django.http import HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
+from django.views import View
 from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
 
-from .forms import CustomerForm, AddBookForm, LoginUserForm, CustomerEditForm, BookEditForm
+from .forms import CustomerForm, AddBookForm, LoginUserForm, CustomerEditForm, BookEditForm, RewiewForm
 from .models import Author, PubHouse
 from .models import Book, Customer
 
@@ -16,8 +17,6 @@ from .models import Book, Customer
 menu = [{'title': "Добавить книгу", 'url_name': "add_book"},
 
         ]
-
-
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1> Страница не найдена</h1>')
 
@@ -100,7 +99,7 @@ class BookEditView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('books')
     slug_url_kwarg = 'slug_book'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *args, object_list=None, **kwargs):
         kwargs['update'] = True
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
@@ -111,6 +110,7 @@ class BookEditView(LoginRequiredMixin, UpdateView):
         if self.request.user != kwargs['instance'].creator:
             return self.handle_no_permission()
         return kwargs
+
 
 
 class BookDeleteView(LoginRequiredMixin, DeleteView):
@@ -124,6 +124,7 @@ class BookDeleteView(LoginRequiredMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
         return context
+
 
 
     def delete(self, request, *args, **kwargs):
@@ -212,17 +213,45 @@ class BookAll(ListView):
 #     })
 
 
-class ShowBook(DetailView):
+class ShowBook(FormMixin, DetailView):
     model = Book
     template_name = 'book/one_book.html'
     context_object_name = "book"
     slug_url_kwarg = 'slug_book'
+    form_class = RewiewForm
+    success_url = reverse_lazy('books') ## как вернуться на ту же?
+
+
+    # def get_success_url(self, **kwargs):
+    #     return reverse_lazy('book_details', kwargs={'slug_book': book.slug})
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
         context['books_selected'] = 0
         return context
+
+    # def form_valid(self, form):
+    #     book = form.save(commit=False)
+    #     # self.object.book = self.get_object()
+    #     book.creator = self.request.user
+    #     book.save()
+    #     return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_valid(form)
+
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.book = self.get_object()
+        self.object.creator = self.request.user
+        self.object.save()
+        return super().form_valid(form)
 
 
 # def one_books(request, slug_book: str):
@@ -269,6 +298,10 @@ class ShowPubHouse(DetailView):
         context['menu'] = menu
         context['pub_houses_selected'] = 0
         return context
+
+
+
+
 
 # def one_pub_house(request, slug_pub_house: str):
 #     pub_house = get_object_or_404(PubHouse, slug=slug_pub_house)
