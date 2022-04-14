@@ -1,14 +1,11 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from transliterate import translit
+from user.models import Customer
 
-from .validators import phone_validator
 
-# User = get_user_model()
 
 
 class Author(models.Model):
@@ -91,7 +88,7 @@ class Book(models.Model):
     cover = models.CharField('переплет', max_length=10, choices=COVER_CHOICES, default='solid')
     pub_house = models.ManyToManyField(PubHouse, verbose_name='издательство')
     book_place = models.OneToOneField(BookPlace, on_delete=models.SET_NULL, null=True, blank=True)
-    creator = models.ForeignKey('Customer', on_delete=models.CASCADE, default=1, verbose_name='создатель')
+    creator = models.ForeignKey('user.Customer', on_delete=models.CASCADE, default=1, verbose_name='создатель')
 
     def save(self, *args, **kwargs):
         self.slug = slugify(translit(self.title, 'ru', reversed=True))
@@ -104,24 +101,10 @@ class Book(models.Model):
         return f"{self.title} - {self.rating}"
 
 
-class Customer(AbstractUser):
-    SEX_CHOICES = [
-        ('male', 'Мужской'),
-        ('female', 'Женский'),
-    ]
-
-    phone = models.CharField('телефон', validators=[phone_validator], max_length=13)
-    age = models.IntegerField('возраст', validators=[MinValueValidator(1),
-                                                     MaxValueValidator(100)], default=18)
-    sex = models.CharField(max_length=10, choices=SEX_CHOICES, default='male', verbose_name='пол')
-
-    def get_absolute_url(self):
-        return reverse('user_detail', args=[str(self.id)])
-
 
 class Comment(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comment_book')
-    creator = models.ForeignKey('Customer', on_delete=models.CASCADE, default=1, verbose_name='автор комментария')
+    creator = models.ForeignKey('user.Customer', on_delete=models.CASCADE, default=1, verbose_name='автор комментария')
     body = models.TextField('текст')
     created = models.DateTimeField('создано',auto_now_add=True)
     updated = models.DateTimeField('измененно', auto_now=True)
@@ -134,3 +117,4 @@ class Comment(models.Model):
 
     def __str__(self):
         return 'Comment by {} on {}'.format(self.creator, self.book)
+

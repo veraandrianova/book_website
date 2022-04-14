@@ -1,77 +1,22 @@
-from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView
-from django.core.checks import messages
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponse
-from django.shortcuts import redirect
-from django.urls import reverse_lazy, reverse
-from django.views import View
+from django.http import HttpResponseNotFound, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
 
-from .forms import CustomerForm, AddBookForm, LoginUserForm, CustomerEditForm, BookEditForm, RewiewForm
-from .models import Author, PubHouse
-from .models import Book, Customer
+from .forms import AddBookForm, BookEditForm, RewiewForm
+from .models import Author, PubHouse, Book
 
 # Create your views here.
 menu = [{'title': "Добавить книгу", 'url_name': "add_book"},
 
         ]
+
+
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1> Страница не найдена</h1>')
-
-
-class LoginUser(LoginView):
-    form_class = LoginUserForm
-    template_name = "registration/login.html"
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['menu'] = menu
-        return context
-
-    def get_success_url(self):
-        user_id = self.request.user.id
-        return reverse('update_user', kwargs={'pk': user_id})
-
-
-def logout_user(request):
-    logout(request)
-    return redirect('login')
-
-
-class SignUp(CreateView):
-    form_class = CustomerForm
-    success_url = reverse_lazy("login")
-    template_name = "registration/signup.html"
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['menu'] = menu
-        return context
-
-    def form_valid(self, form):
-        user = form.save()
-        login(self.request, user)
-        return redirect('login')
-
-
-class ProfileEditView(LoginRequiredMixin, UpdateView):
-    model = Customer
-    template_name = 'registration/create_one.html'
-    form_class = CustomerEditForm
-    login_url = 'login'
-    success_url = reverse_lazy('books')
-
-    # def get_object(self, *args, **kwargs):
-    #     return self.request.user
-
-
-class ProfileDeleteView(LoginRequiredMixin, DeleteView):
-    model = Customer
-    template_name = 'registration/delete_user.html'
-    success_url = reverse_lazy('books')
 
 
 class AddBook(LoginRequiredMixin, CreateView):
@@ -97,7 +42,6 @@ class BookEditView(LoginRequiredMixin, UpdateView):
     model = Book
     template_name = 'book/book_edit.html'
     form_class = BookEditForm
-    success_url = reverse_lazy('books')
     slug_url_kwarg = 'slug_book'
 
     def get_context_data(self, *args, object_list=None, **kwargs):
@@ -113,20 +57,16 @@ class BookEditView(LoginRequiredMixin, UpdateView):
         return kwargs
 
 
-
 class BookDeleteView(LoginRequiredMixin, DeleteView):
     model = Book
     template_name = 'book/delete_book.html'
     success_url = reverse_lazy('books')
     slug_url_kwarg = 'slug_book'
 
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
         return context
-
-
 
     def delete(self, request, *args, **kwargs):
         self.book = self.get_object()
@@ -135,7 +75,6 @@ class BookDeleteView(LoginRequiredMixin, DeleteView):
             return self.handle_no_permission()
         self.object.delete()
         return HttpResponseRedirect(success_url)
-
 
 
 class AuthorAll(ListView):
@@ -190,7 +129,6 @@ class BookAll(ListView):
     template_name = "book/all_books.html"
     context_object_name = "books"
 
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
@@ -217,14 +155,10 @@ class BookAll(ListView):
 class ShowBook(FormMixin, DetailView):
     model = Book
     template_name = 'book/one_book.html'
-    context_object_name = "book"
     slug_url_kwarg = 'slug_book'
     form_class = RewiewForm
-    success_url = reverse_lazy('books') ## как вернуться на ту же?
 
-
-    # def get_success_url(self, **kwargs):
-    #     return reverse_lazy('book_details', kwargs={'slug_book': book.slug})
+    # success_url = reverse_lazy('books') ## как вернуться на ту же?
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -232,6 +166,11 @@ class ShowBook(FormMixin, DetailView):
         context['books_selected'] = 0
         return context
 
+    def get_success_url(self):
+
+        if not self.success_url:
+            raise ImproperlyConfigured("No URL to redirect to. Provide a success_url.")
+        return str(self.success_url)
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -240,7 +179,6 @@ class ShowBook(FormMixin, DetailView):
         else:
             return self.form_valid(form)
 
-
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.book = self.get_object()
@@ -248,15 +186,17 @@ class ShowBook(FormMixin, DetailView):
         self.object.creator = self.request.user
         self.object.save()
         # return HttpResponseRedirect(self.get_success_url())
-        return super().form_valid(form)
+        return redirect(self.success_url)
+
+
     # def form_valid(self, form):
     #     self.object = form.save(commit=False)
     #     self.object.book = self.get_object()
-    #     self.success_url = self.get_success_url()
-    #     if self.object.creator != self.request.user:
-    #         return redirect('login')
+    #     # self.success_url = self.get_success_url()
+    #     self.object.creator = self.request.user
+    #
     #     self.object.save()
-    #     return super().form_valid(form)
+    #     return redirect(self.success_url)
 
 
 # def one_books(request, slug_book: str):
@@ -304,36 +244,9 @@ class ShowPubHouse(DetailView):
         context['pub_houses_selected'] = 0
         return context
 
-
-
-
-
 # def one_pub_house(request, slug_pub_house: str):
 #     pub_house = get_object_or_404(PubHouse, slug=slug_pub_house)
 #     return render(request, 'pub_house/one_pub_house.html', {
 #         'pub_house': pub_house,
 #
-#     })
-
-
-# class CreateUser(CreateView):
-#     model = Users
-#     template_name = 'users/create.html'
-#     fields = ['firstname', 'lastname', 'email', 'phone', 'age', 'sex']
-#
-# def users_create(request):
-#     form = UsersForm(request.POST or None)
-#     if form.is_valid():
-#         form.save()
-#         return redirect('users')
-#     else:
-#         context = {'form': form}
-#
-#     return render(request, 'users/create.html', context)
-#
-#
-# def one_create(request, id: int):
-#     user = get_object_or_404(Users, id=id)
-#     return render(request, 'users/create_one.html', {
-#         'user': user
 #     })

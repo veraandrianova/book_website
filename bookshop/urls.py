@@ -25,8 +25,9 @@ from book.views import pageNotFound
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('book.urls')),
+    path('', include('user.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('home/', include('book.urls')),
+    # path('home/', include('book.urls')),
     path('captcha/', include('captcha.urls'))
 ]
 if settings.DEBUG:
