@@ -5,6 +5,7 @@
 
 
 {% block content %}
+
 <ul class="list-articles">
      {% for book in books %}
               <li>
@@ -13,7 +14,7 @@
 {% endif %}
                   <h2>{{book.title}}</h2>
      {% autoescape on %}
-     {{book.description}}
+     {{book.description|linebreaks|truncatewords:50}}
      {% endautoescape %}
               <div class="clear"</div>
               <p class="link-read-post"><a href="{% url 'book_details' book.slug %}">Читать</a></p>

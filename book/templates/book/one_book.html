@@ -23,9 +23,9 @@
 {% if request.user == book.creator %}
 <a href="{% url 'book_edit' book.slug %}">Редактировать книгу</a>
 {% endif %}
-
+{% if request.user == book.creator %}
 <a href="{% url 'book_delete' book.slug %}">Удалить книгу</a>
-
+{% endif %}
 <p>Комментарии</p>
 <ul>
 {% for item in book.comment_book.all %}

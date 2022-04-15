@@ -20,7 +20,7 @@
             <li><a href="{% url m.url_name %}"> {{m.title}}</a></li>
 {% endfor %}
            {% if request.user.is_authenticated %}
-               <li class="last">{{user.username}} | <a href="{% url 'logout' %}">Выйти</a></li>
+                <li class="last"><a href="{% url 'update_user' user.pk %}">{{user.username}}</a> | <a href="{% url 'logout' %}">Выйти</a></li>
            {% else %}
                <li class="last"><a href="{% url 'signup' %}">Регистрация</a> | <a href="{% url 'login' %}">Войти</a>
            {% endif %}

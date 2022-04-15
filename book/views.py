@@ -1,11 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Q
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
-
+from taggit.models import Tag
 from .forms import AddBookForm, BookEditForm, RewiewForm
 from .models import Author, PubHouse, Book
 
@@ -107,7 +108,7 @@ class ShowAuthor(DetailView):
     model = Author
     template_name = 'author/one_author.html'
     context_object_name = "author"
-    slug_url_kwarg = 'slug_author'
+
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -128,6 +129,7 @@ class BookAll(ListView):
     model = Book
     template_name = "book/all_books.html"
     context_object_name = "books"
+    queryset = Book.objects.filter(is_published=True)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -155,8 +157,9 @@ class BookAll(ListView):
 class ShowBook(FormMixin, DetailView):
     model = Book
     template_name = 'book/one_book.html'
-    slug_url_kwarg = 'slug_book'
+    tag = None
     form_class = RewiewForm
+
 
     # success_url = reverse_lazy('books') ## как вернуться на ту же?
 
@@ -164,29 +167,27 @@ class ShowBook(FormMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
         context['books_selected'] = 0
+        print(context)
         return context
 
     def get_success_url(self):
+        slug = self.kwargs['slug']
 
-        if not self.success_url:
-            raise ImproperlyConfigured("No URL to redirect to. Provide a success_url.")
-        return str(self.success_url)
+        return reverse('book_details', kwargs={'slug': slug})
 
     def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
         form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_valid(form)
+        return self.form_valid(form)
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.book = self.get_object()
-        self.success_url = self.get_success_url()
         self.object.creator = self.request.user
         self.object.save()
         # return HttpResponseRedirect(self.get_success_url())
-        return redirect(self.success_url)
+        return super().form_valid(form)
 
 
     # def form_valid(self, form):
@@ -236,7 +237,6 @@ class ShowPubHouse(DetailView):
     model = PubHouse
     template_name = 'pub_house/one_pub_house.html'
     context_object_name = "pub_house"
-    slug_url_kwarg = 'slug_pub_house'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -250,3 +250,17 @@ class ShowPubHouse(DetailView):
 #         'pub_house': pub_house,
 #
 #     })
+
+class Search(ListView):
+    model = Book
+    template_name = 'book/all_books.html'
+    context_object_name = "books"
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        object_list = Book.objects.filter(
+            Q(title__icontains=query)
+
+        )
+        return object_list
+

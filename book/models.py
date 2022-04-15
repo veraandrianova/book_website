@@ -90,12 +90,13 @@ class Book(models.Model):
     book_place = models.OneToOneField(BookPlace, on_delete=models.SET_NULL, null=True, blank=True)
     creator = models.ForeignKey('user.Customer', on_delete=models.CASCADE, default=1, verbose_name='создатель')
 
+
     def save(self, *args, **kwargs):
         self.slug = slugify(translit(self.title, 'ru', reversed=True))
         super(Book, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('book_details', kwargs={'slug_book': self.slug})
+        return reverse('book_details', kwargs={'slug': self.slug})
 
     def __str__(self):
         return f"{self.title} - {self.rating}"

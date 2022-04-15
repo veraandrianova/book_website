@@ -57,8 +57,9 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
     model = Customer
     template_name = 'registration/create_one.html'
     form_class = CustomerEditForm
-    login_url = 'login'
-    success_url = reverse_lazy('books')
+
+    def get_success_url(self):
+        return reverse('update_user', kwargs={'pk': self.kwargs['pk']})
 
     # def get_object(self, *args, **kwargs):
     #     return self.request.user

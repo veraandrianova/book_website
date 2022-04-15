@@ -22,12 +22,14 @@
                     <li><a href="{% url m.url_name %}"> {{m.title}}</a></li>
                     {% endfor %}
                     {% if request.user.is_authenticated %}
-                    <li class="last"> {{user.username}} | <a href="{% url 'logout' %}">Выйти</a></li>
+                    <li class="last"><a href="{% url 'update_user' user.pk %}">{{user.username}}</a> | <a
+                            href="{% url 'logout' %}">Выйти</a></li>
                     {% else %}
-                    <li class="last"><a href="{% url 'signup' %}">Регистрация</a> | <a href="{% url 'login' %}">Войти</a></li>
+                    <li class="last"><a href="{% url 'signup' %}">Регистрация</a> | <a
+                            href="{% url 'login' %}">Войти</a></li>
 
                     {% endif %}
-                        </li>
+                    </li>
 
                 </ul>
                 <div class="clear"></div>
@@ -38,6 +40,9 @@
                     <td valign="top" class="left-chapters">
                         <ul id="left-chapters">
                             <li class="selected">Библиотека</li>
+                            <form action="{% url 'search' %}" method="get">
+                                <input name="q" type="text" placeholder="Поиск...">
+                            </form>
                             <li><a href="{% url 'books' %}">Книги</a></li>
                             <li><a href="{% url 'author' %}">Авторы</a></li>
                             <li><a href="{% url 'pub_house' %}">Издательства</a></li>
