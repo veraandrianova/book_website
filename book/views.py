@@ -3,6 +3,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.context_processors import request
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
@@ -161,8 +162,6 @@ class ShowBook(FormMixin, DetailView):
     form_class = RewiewForm
 
 
-    # success_url = reverse_lazy('books') ## как вернуться на ту же?
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
@@ -256,11 +255,24 @@ class Search(ListView):
     template_name = 'book/all_books.html'
     context_object_name = "books"
 
+
+    # def get_context_data(self, *, object_list=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['menu'] = menu
+    #     return context
+    #
+    # def get_queryset(self):
+    #     query = self.request.GET.get('q')
+    #     books = Book.objects.filter(
+    #         Q(title__icontains=query)
+    #
+    #     )
+    #     return books
     def get_queryset(self):
-        query = self.request.GET.get('q')
-        object_list = Book.objects.filter(
-            Q(title__icontains=query)
+        return Book.objects.filter(title__icontains=self.request.GET.get("q"))
 
-        )
-        return object_list
-
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get("q")
+        context['menu'] = menu
+        return context

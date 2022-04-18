@@ -36,7 +36,7 @@ class PubHouse(models.Model):
         verbose_name = 'издание'
         verbose_name_plural = 'издания'
 
-    name_house = models.CharField('название издательства', max_length=70)
+    name_house = models.CharField('название издательства', max_length=70, unique = True)
     email = models.CharField('почта', max_length=70)
     slug = models.SlugField(default='', null=False, blank=True)
     address = models.CharField('адрес', max_length=200, default='', null=False, blank=True)
@@ -76,7 +76,7 @@ class Book(models.Model):
         ('soft', 'Мягкий переплет'),
     ]
 
-    title = models.CharField('название', max_length=70)
+    title = models.CharField('название', max_length=70, unique = True)
     description = models.TextField("Описание", blank=True)
     image = models.ImageField("Постер", upload_to="photos/", blank=True)
     rating = models.IntegerField('Рейтинг', validators=[MinValueValidator(1),

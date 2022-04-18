@@ -32,4 +32,3 @@ class RewiewForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ["body"]
-
