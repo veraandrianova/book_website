@@ -44,7 +44,7 @@ class BookEditView(LoginRequiredMixin, UpdateView):
     model = Book
     template_name = 'book/book_edit.html'
     form_class = BookEditForm
-    slug_url_kwarg = 'slug_book'
+
 
     def get_context_data(self, *args, object_list=None, **kwargs):
         kwargs['update'] = True
@@ -63,7 +63,6 @@ class BookDeleteView(LoginRequiredMixin, DeleteView):
     model = Book
     template_name = 'book/delete_book.html'
     success_url = reverse_lazy('books')
-    slug_url_kwarg = 'slug_book'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
