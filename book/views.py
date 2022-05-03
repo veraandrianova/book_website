@@ -1,13 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Q
 from django.http import HttpResponseNotFound, HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
-from django.template.context_processors import request
+from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
-from taggit.models import Tag
+
 from .forms import AddBookForm, BookEditForm, RewiewForm
 from .models import Author, PubHouse, Book
 
@@ -15,6 +12,10 @@ from .models import Author, PubHouse, Book
 menu = [{'title': "Добавить книгу", 'url_name': "add_book"},
 
         ]
+
+
+def upper(string: str):
+    return string.upper()
 
 
 def pageNotFound(request, exception):
@@ -25,10 +26,8 @@ class AddBook(LoginRequiredMixin, CreateView):
     form_class = AddBookForm
     template_name = 'book/add_book.html'
 
-    def get_object(self, *args, **kwargs):
-        return self.request.user
-
     def form_valid(self, form):
+        print(self.request.POST)
         book = form.save(commit=False)
         book.creator = self.request.user
         book.save()
@@ -44,7 +43,6 @@ class BookEditView(LoginRequiredMixin, UpdateView):
     model = Book
     template_name = 'book/book_edit.html'
     form_class = BookEditForm
-
 
     def get_context_data(self, *args, object_list=None, **kwargs):
         kwargs['update'] = True
@@ -109,7 +107,6 @@ class ShowAuthor(DetailView):
     template_name = 'author/one_author.html'
     context_object_name = "author"
 
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
@@ -160,7 +157,6 @@ class ShowBook(FormMixin, DetailView):
     tag = None
     form_class = RewiewForm
 
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
@@ -186,7 +182,6 @@ class ShowBook(FormMixin, DetailView):
         self.object.save()
         # return HttpResponseRedirect(self.get_success_url())
         return super().form_valid(form)
-
 
     # def form_valid(self, form):
     #     self.object = form.save(commit=False)
@@ -242,6 +237,7 @@ class ShowPubHouse(DetailView):
         context['pub_houses_selected'] = 0
         return context
 
+
 # def one_pub_house(request, slug_pub_house: str):
 #     pub_house = get_object_or_404(PubHouse, slug=slug_pub_house)
 #     return render(request, 'pub_house/one_pub_house.html', {
@@ -249,11 +245,10 @@ class ShowPubHouse(DetailView):
 #
 #     })
 
-class Search(ListView):
+class SearchBook(ListView):
     model = Book
     template_name = 'book/all_books.html'
     context_object_name = "books"
-
 
     # def get_context_data(self, *, object_list=None, **kwargs):
     #     context = super().get_context_data(**kwargs)
@@ -268,7 +263,43 @@ class Search(ListView):
     #     )
     #     return books
     def get_queryset(self):
-        return Book.objects.filter(title__icontains=self.request.GET.get("q"))
+        print(self.request.GET.get('q'))
+        queryset = Book.objects.filter(title__icontains=self.request.GET.get("q").title())
+        return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get("q")
+        context['menu'] = menu
+        return context
+
+
+
+class SearchAuthor(ListView):
+    model = Author
+    template_name = 'author/all_authors.html'
+    context_object_name = "authors"
+
+    def get_queryset(self):
+        print(self.request.GET.get('q'))
+        queryset = Author.objects.filter(lastname__icontains=self.request.GET.get("q").title())
+        return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get("q")
+        context['menu'] = menu
+        return context
+
+class SearchPubHouse(ListView):
+    model = PubHouse
+    template_name = 'pub_house/all_pub_houses.html'
+    context_object_name = "pub_houses"
+
+    def get_queryset(self):
+        print(self.request.GET.get('q'))
+        queryset = PubHouse.objects.filter(name_house__icontains=self.request.GET.get("q").title())
+        return queryset
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -21,7 +21,7 @@ class Author(models.Model):
     name = models.CharField(max_length=70, blank=True)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(translit(self.name, 'ru', reversed=True))
+        self.slug = slugify(translit(f'{self.firstname} {self.lastname}', 'ru', reversed=True))
         super(Author, self).save(*args, **kwargs)
 
     def get_url(self):
@@ -36,7 +36,7 @@ class PubHouse(models.Model):
         verbose_name = 'издание'
         verbose_name_plural = 'издания'
 
-    name_house = models.CharField('название издательства', max_length=70, unique = True)
+    name_house = models.CharField('название издательства', max_length=70, unique=True)
     email = models.CharField('почта', max_length=70)
     slug = models.SlugField(default='', null=False, blank=True)
     address = models.CharField('адрес', max_length=200, default='', null=False, blank=True)
@@ -76,7 +76,7 @@ class Book(models.Model):
         ('soft', 'Мягкий переплет'),
     ]
 
-    title = models.CharField('название', max_length=70, unique = True)
+    title = models.CharField('название', max_length=70, unique=True)
     description = models.TextField("Описание", blank=True)
     image = models.ImageField("Постер", upload_to="photos/", blank=True)
     rating = models.IntegerField('Рейтинг', validators=[MinValueValidator(1),
@@ -88,7 +88,7 @@ class Book(models.Model):
     cover = models.CharField('переплет', max_length=10, choices=COVER_CHOICES, default='solid')
     pub_house = models.ManyToManyField(PubHouse, verbose_name='издательство')
     book_place = models.OneToOneField(BookPlace, on_delete=models.SET_NULL, null=True, blank=True)
-    creator = models.ForeignKey('user.Customer', on_delete=models.CASCADE, default=1, verbose_name='создатель')
+    creator = models.ForeignKey('user.Customer', on_delete=models.CASCADE, verbose_name='создатель')
 
 
     def save(self, *args, **kwargs):
