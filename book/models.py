@@ -18,7 +18,7 @@ class Author(models.Model):
     image = models.ImageField("Постер", upload_to="movies/", blank=True)
     description = models.TextField("Описание", blank=True)
     slug = models.SlugField(default='', null=False, blank=True)
-    name = models.CharField(max_length=70, blank=True)
+
 
     def save(self, *args, **kwargs):
         self.slug = slugify(translit(f'{self.firstname} {self.lastname}', 'ru', reversed=True))
@@ -37,7 +37,7 @@ class PubHouse(models.Model):
         verbose_name_plural = 'издания'
 
     name_house = models.CharField('название издательства', max_length=70, unique=True)
-    email = models.CharField('почта', max_length=70)
+    email = models.EmailField('почта', max_length=70)
     slug = models.SlugField(default='', null=False, blank=True)
     address = models.CharField('адрес', max_length=200, default='', null=False, blank=True)
 

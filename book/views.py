@@ -13,11 +13,6 @@ menu = [{'title': "Добавить книгу", 'url_name': "add_book"},
 
         ]
 
-
-def upper(string: str):
-    return string.upper()
-
-
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1> Страница не найдена</h1>')
 

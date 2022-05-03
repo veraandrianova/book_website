@@ -35,59 +35,59 @@
                 <div class="clear"></div>
             </div>
             {% endblock mainmenu %}
-<!--            <table class="table-content" border=0 cellpadding="0" cellspacing="0">-->
-<!--                <tr>-->
-<!--                    <td valign="top" class="left-chapters">-->
-<!--                        <ul id="left-chapters">-->
-<!--                            <li class="selected">Библиотека</li>-->
-<!--                            <form action="{% url 'search_book' %}" method="get">-->
-<!--                                <input name="q" type="text" placeholder="Поиск...">-->
-<!--                            </form>-->
-<!--                            <li><a href="{% url 'books' %}">Книги</a></li>-->
-<!--                            <li><a href="{% url 'author' %}">Авторы</a></li>-->
-<!--                            <li><a href="{% url 'pub_house' %}">Издательства</a></li>-->
+                <!--            <table class="table-content" border=0 cellpadding="0" cellspacing="0">-->
+                <!--                <tr>-->
+                <!--                    <td valign="top" class="left-chapters">-->
+                <!--                        <ul id="left-chapters">-->
+                <!--                            <li class="selected">Библиотека</li>-->
+                <!--                            <form action="{% url 'search_book' %}" method="get">-->
+                <!--                                <input name="q" type="text" placeholder="Поиск...">-->
+                <!--                            </form>-->
+                <!--                            <li><a href="{% url 'books' %}">Книги</a></li>-->
+                <!--                            <li><a href="{% url 'author' %}">Авторы</a></li>-->
+                <!--                            <li><a href="{% url 'pub_house' %}">Издательства</a></li>-->
 
-<!--                        </ul>-->
-<!--                    </td>-->
-<!--                    <td valign="top" class="content">-->
-                        {% block breadcrumbs %}
-                        {% endblock %}
+                <!--                        </ul>-->
+                <!--                    </td>-->
+                <!--                    <td valign="top" class="content">-->
+                {% block breadcrumbs %}
+                {% endblock %}
 
-                        <div class="content-text">
-                            {% block content %}
-                            {% endblock %}
-                            {% if page_obj.has_other_pages %}
+                <div class="content-text">
+                    {% block content %}
+                    {% endblock %}
+                    {% if page_obj.has_other_pages %}
+                    <nav class="list-pages">
+                        <ul>
+                            {% if page_obj.has_previous %}
+                            <li class="page-num"
+                            <a href="?page={{ page_obj.previous_page_number }}">&lt;</a>
+                            </li>
+                            {% endif %}
+                            {% endif %}
+                            {% for book in paginator.page_range %}
+                            {% if page_obj.number == book %}
+                            <li class="page-num page-num-selected">{{ author }}</li>
+                            {% elif book >= page_obj.number|add:-2 and book <= page_obj.number|add:2 %}
+                            <li class="page-num">
+                                <a href="?page={{ book }}">{{ book }}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
                             <nav class="list-pages">
                                 <ul>
                                     {% if page_obj.has_previous %}
                                     <li class="page-num"
-                                    <a href="?page={{ page_obj.previous_page_number }}">&lt;</a>
+                                    <a href="?page={{ page_obj.nex_page_number }}">&gt;</a>
                                     </li>
                                     {% endif %}
-                                    {% endif %}
-                                    {% for book in paginator.page_range %}
-                                    {% if page_obj.number == book %}
-                                    <li class="page-num page-num-selected">{{ author }}</li>
-                                    {% elif book >= page_obj.number|add:-2 and book <= page_obj.number|add:2 %}
-                                    <li class="page-num">
-                                        <a href="?page={{ book }}">{{ book }}</a>
-                                    </li>
-                                    {% endif %}
-                                    {% endfor %}
-                                    {% if page_obj.has_next %}
-                                    <nav class="list-pages">
-                                        <ul>
-                                            {% if page_obj.has_previous %}
-                                            <li class="page-num"
-                                            <a href="?page={{ page_obj.nex_page_number }}">&gt;</a>
-                                            </li>
-                                            {% endif %}
-                                        </ul>
-                                    </nav>
-                                    {% endif %}
-                        </div>
-                    </td>
-                </tr>
-            </table>
+                                </ul>
+                            </nav>
+                            {% endif %}
+                </div>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

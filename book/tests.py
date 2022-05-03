@@ -1,12 +1,15 @@
 # Create your tests here.
 
-from django.test import TestCase, Client
-from django.template.defaultfilters import slugify
-from .models import Author, PubHouse, Book
 from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
+from django.template.defaultfilters import slugify
+from django.test import TestCase, Client
+
+from .models import Author, PubHouse, Book
 
 User = get_user_model()
+
+
 # Create your tests here.
 
 
@@ -53,8 +56,6 @@ class AuthorModelTest(TestCase):
 
     def test_get_url(self):
         author = Author.objects.get(id=1)
-        # This will also fail if the urlconf is not defined.
-        print(author.slug)
         self.assertEquals(author.get_url(), '/author/big-bob/')
 
 
@@ -110,19 +111,51 @@ class PubHouseModelTest(TestCase):
         self.assertEquals(pub_house.get_url(), '/pub_house/cleaver/')
 
 
-
 class BookModelTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
         # Set up non-modified objects used by all test methods
         creator = User.objects.create(username='test_user')
-        Book.objects.create(title='test1', creator=creator)
+        Book.objects.create(title='test1', rating='90', creator=creator)
 
     def test_title_label(self):
         book = Book.objects.get(id=1)
         field_label = book._meta.get_field('title').verbose_name
         self.assertEquals(field_label, 'название')
+
+    def test_title_label(self):
+        book = Book.objects.get(id=1)
+        field_label = book._meta.get_field('description').verbose_name
+        self.assertEquals(field_label, 'Описание')
+
+    def test_description_label(self):
+        book = Book.objects.get(id=1)
+        field_label = book._meta.get_field('description').verbose_name
+        self.assertEquals(field_label, 'Описание')
+
+    def test_rating_label(self):
+        book = Book.objects.get(id=1)
+        field_label = book._meta.get_field('rating').verbose_name
+        self.assertEquals(field_label, 'Рейтинг')
+
+    def test_title_max_length(self):
+        book = Book.objects.get(id=1)
+        max_length = book._meta.get_field('title').max_length
+        self.assertEquals(max_length, 70)
+
+    def test_object_name_is_book(self):
+        book = Book.objects.get(id=1)
+        expected_object_name = f'{book.title} - {book.rating}'
+        self.assertEquals(expected_object_name, str(book))
+
+    def test_book_has_slug(self):
+        book = Book.objects.get(id=1)
+        self.assertEqual(book.slug, slugify(book.title))
+
+    def test_get_absolute_url(self):
+        book = Book.objects.get(id=1)
+        self.assertEquals(book.get_absolute_url(), '/book/test1/')
 
 
 class TestAddBookView(TestCase):
@@ -137,7 +170,6 @@ class TestAddBookView(TestCase):
         # Set up non-modified objects used by all test methods
         Author.objects.create(firstname='first', lastname='last')
         cls.pub_house = PubHouse.objects.create(name_house='Test house', email='example@mail.com')
-
 
     def test_login_required(self):
         unauthorized_client = Client()
@@ -163,10 +195,147 @@ class TestAddBookView(TestCase):
             'author': '1',
             'pub_house': [str(self.pub_house.id)]
         })
-        assert response.status_code == 302,  f'Status code is not 302! code={response.status_code}'
+        assert response.status_code == 302, f'Status code is not 302! code={response.status_code}'
         book = Book.objects.get(id=1)
         assert book
         assert book.creator == self.test_user, 'Book creator is not test_user!'
         assert book.author == Author.objects.get(id=1)
         assert book.pub_house.first() == self.pub_house, f'Book pub_house={book.pub_house}, pub_house must be {self.pub_house}'
 
+
+class TestEditBookView(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.client = Client()
+        cls.test_user = User.objects.create(username='test_user')
+
+    # @classmethod
+    # def setUpTestData(cls):
+    #     # Set up non-modified objects used by all test methods
+    #     Book.objects.create(title='title')
+
+    # def test_login_required(self):
+    #     unauthorized_client = Client()
+    #     response = unauthorized_client.get(reverse('book_edit'))
+    #     assert response.status_code == 302, 'Unauthorized user does not redirected to login page!'
+
+
+class TestAuthorAll(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.client = Client()
+        cls.test_user = User.objects.create(username='test_user')
+
+    @classmethod
+    def setUpTestData(cls):
+        # Create 13 authors for pagination tests
+        number_of_authors = 13
+        for author_num in range(number_of_authors):
+            Author.objects.create(firstname='Christian %s' % author_num, lastname='Surname %s' % author_num, )
+
+    def test_view_url_exists_at_desired_location(self):
+        resp = self.client.get('/author/')
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        resp = self.client.get(reverse('author'))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        resp = self.client.get(reverse('author'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'author/all_authors.html')
+
+    def test_pagination_is_ten(self):
+        resp = self.client.get(reverse('author'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('is_paginated' in resp.context)
+        self.assertTrue(resp.context['is_paginated'] == True)
+        # self.assertTrue( len(resp.context['all_authors']) == 5)
+
+    def test_context_data(self):
+        self.client.force_login(self.test_user)
+        response = self.client.get(reverse('author'))
+        assert response.context['menu'], 'Context data has no menu object!'
+
+
+
+
+class TestPubHouseAll(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.client = Client()
+        cls.test_user = User.objects.create(username='test_user')
+
+    @classmethod
+    def setUpTestData(cls):
+        # Create 13 authors for pagination tests
+        number_of_pub_house = 13
+        for pub_house_num in range(number_of_pub_house):
+            PubHouse.objects.create(name_house='test %s' % pub_house_num, email='test %s' % pub_house_num, )
+
+    def test_view_url_exists_at_desired_location(self):
+        resp = self.client.get('/pub_house/')
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        resp = self.client.get(reverse('pub_house'))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        resp = self.client.get(reverse('pub_house'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'pub_house/all_pub_houses.html')
+
+    def test_pagination_is_ten(self):
+        resp = self.client.get(reverse('pub_house'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('is_paginated' in resp.context)
+        self.assertTrue(resp.context['is_paginated'] == True)
+        # self.assertTrue( len(resp.context['all_pub_houses']) == 5)
+
+    def test_context_data(self):
+        self.client.force_login(self.test_user)
+        response = self.client.get(reverse('pub_house'))
+        assert response.context['menu'], 'Context data has no menu object!'
+
+
+
+# class TestBookAll(TestCase):
+#     @classmethod
+#     def setUpClass(cls):
+#         super().setUpClass()
+#         cls.client = Client()
+#         cls.test_user = User.objects.create(username='test_user')
+#
+#     @classmethod
+#     def setUpTestData(cls):
+#         # Create 13 authors for pagination tests
+#         number_of_book = 13
+#         for book_num in range(number_of_book):
+#             Book.objects.create(title='test %s' % book_num, description='test %s' % book_num)
+#
+#
+#     def test_view_url_accessible_by_name(self):
+#         resp = self.client.get(reverse('books'))
+#         self.assertEqual(resp.status_code, 200)
+#
+#     def test_view_uses_correct_template(self):
+#         resp = self.client.get(reverse('books'))
+#         self.assertEqual(resp.status_code, 200)
+#         self.assertTemplateUsed(resp, 'book/all_books.html')
+#
+#     def test_pagination_is_ten(self):
+#         resp = self.client.get(reverse('books'))
+#         self.assertEqual(resp.status_code, 200)
+#         self.assertTrue('is_paginated' in resp.context)
+#         self.assertTrue(resp.context['is_paginated'] == True)
+#         # self.assertTrue( len(resp.context['all_pub_houses']) == 5)
+#
+#     def test_context_data(self):
+#         self.client.force_login(self.test_user)
+#         response = self.client.get(reverse('books'))
+#         assert response.context['menu'], 'Context data has no menu object!'
