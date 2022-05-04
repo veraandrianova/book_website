@@ -149,7 +149,6 @@ class BookAll(ListView):
 class ShowBook(FormMixin, DetailView):
     model = Book
     template_name = 'book/one_book.html'
-    tag = None
     form_class = RewiewForm
 
     def get_context_data(self, *, object_list=None, **kwargs):

@@ -202,23 +202,30 @@ class TestAddBookView(TestCase):
         assert book.author == Author.objects.get(id=1)
         assert book.pub_house.first() == self.pub_house, f'Book pub_house={book.pub_house}, pub_house must be {self.pub_house}'
 
-
-class TestEditBookView(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.client = Client()
-        cls.test_user = User.objects.create(username='test_user')
-
-    # @classmethod
-    # def setUpTestData(cls):
-    #     # Set up non-modified objects used by all test methods
-    #     Book.objects.create(title='title')
-
-    # def test_login_required(self):
-    #     unauthorized_client = Client()
-    #     response = unauthorized_client.get(reverse('book_edit'))
-    #     assert response.status_code == 302, 'Unauthorized user does not redirected to login page!'
+        # class TestEditBookView(TestCase):
+        #     @classmethod
+        #     def setUpClass(cls):
+        #         super().setUpClass()
+        #         cls.client = Client()
+        #         cls.test_user = User.objects.create(username='test_user')
+        #
+        #     @classmethod
+        #     def setUpTestData(cls):
+        #         # Set up non-modified objects used by all test methods
+        #         Author.objects.create(firstname='first', lastname='last')
+        #         cls.pub_house = PubHouse.objects.create(name_house='Test house', email='example@mail.com')
+        #
+        #     def test_book_creator(self):
+        #         self.client.force_login(self.test_user)
+        #         Book.objects.create(title='test1', description='test', creator=self.test_user)
+        #         book = Book.objects.get(id=1)
+        #         response = self.client.get(reverse('/book/test1/'))
+        #         assert response.status_code == 200, 'Код ответа не 200!'
+        # assert response.status_code == 302, f'Status code is not 302! code={response.status_code}'
+        # assert book
+        # assert book.creator == self.test_user, 'Book creator is not test_user!'
+        # assert book.author == Author.objects.get(id=1)
+        # assert book.pub_house.first() == self.pub_house, f'Book pub_house={book.pub_house}, pub_house must be {self.pub_house}'
 
 
 class TestAuthorAll(TestCase):
@@ -261,8 +268,6 @@ class TestAuthorAll(TestCase):
         assert response.context['menu'], 'Context data has no menu object!'
 
 
-
-
 class TestPubHouseAll(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -303,8 +308,88 @@ class TestPubHouseAll(TestCase):
         assert response.context['menu'], 'Context data has no menu object!'
 
 
+class TestBookAll(TestCase):
 
-# class TestBookAll(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.client = Client()
+        cls.test_user = User.objects.create(username='test_user')
+
+    @classmethod
+    def setUpTestData(cls):
+        Author.objects.create(firstname='first', lastname='last')
+        cls.pub_house = PubHouse.objects.create(name_house='Test house', email='example@mail.com')
+
+    def test_book_creator(self):
+        self.client.force_login(self.test_user)
+        Book.objects.create(title='test1', description='test', creator=self.test_user)
+        # book = Book.objects.get(id=1)
+        response = self.client.get(reverse('books'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        response = self.client.get(reverse('books'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'book/all_books.html')
+
+    def test_context_data(self):
+        self.client.force_login(self.test_user)
+        response = self.client.get(reverse('books'))
+        assert response.context['menu'], 'Context data has no menu object!'
+
+
+
+class TestShowAuthor(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.client = Client()
+        cls.test_user = User.objects.create(username='test_user')
+
+    @classmethod
+    def setUpTestData(cls):
+        # Create 13 authors for pagination tests
+        test_author = Author.objects.create(firstname='author', lastname='test')
+
+    def test_login_required(self):
+        author = Author.objects.get(id=1)
+        response = self.client.get('/author/author-test/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'test')
+        self.assertTemplateUsed(response, 'author/one_author.html')
+
+    def test_context_data(self):
+        self.client.force_login(self.test_user)
+        response = self.client.get('/author/author-test/')
+        assert response.context['menu'], 'Context data has no menu object!'
+
+
+class TestShowPubHouse(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.client = Client()
+        cls.test_user = User.objects.create(username='test_user')
+
+    @classmethod
+    def setUpTestData(cls):
+        # Create 13 authors for pagination tests
+        test_pub_house = PubHouse.objects.create(name_house='test', email='test')
+
+    def test_login_required(self):
+        pub_house = PubHouse.objects.get(id=1)
+        response = self.client.get('/pub_house/test/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'test')
+        self.assertTemplateUsed(response, 'pub_house/one_pub_house.html')
+
+    def test_context_data(self):
+        self.client.force_login(self.test_user)
+        response = self.client.get('/pub_house/test/')
+        assert response.context['menu'], 'Context data has no menu object!'
+
+# class TestShowBook(TestCase):
 #     @classmethod
 #     def setUpClass(cls):
 #         super().setUpClass()
@@ -314,28 +399,15 @@ class TestPubHouseAll(TestCase):
 #     @classmethod
 #     def setUpTestData(cls):
 #         # Create 13 authors for pagination tests
-#         number_of_book = 13
-#         for book_num in range(number_of_book):
-#             Book.objects.create(title='test %s' % book_num, description='test %s' % book_num)
+#         test_book = Book.objects.create(title='test', description='test')
 #
-#
-#     def test_view_url_accessible_by_name(self):
-#         resp = self.client.get(reverse('books'))
-#         self.assertEqual(resp.status_code, 200)
-#
-#     def test_view_uses_correct_template(self):
-#         resp = self.client.get(reverse('books'))
-#         self.assertEqual(resp.status_code, 200)
-#         self.assertTemplateUsed(resp, 'book/all_books.html')
-#
-#     def test_pagination_is_ten(self):
-#         resp = self.client.get(reverse('books'))
-#         self.assertEqual(resp.status_code, 200)
-#         self.assertTrue('is_paginated' in resp.context)
-#         self.assertTrue(resp.context['is_paginated'] == True)
-#         # self.assertTrue( len(resp.context['all_pub_houses']) == 5)
+#     def test_login_required(self):
+#         book  = Book.objects.get(id=1)
+#         response = self.client.get('/book/test/')
+#         self.assertEqual(response.status_code, 200)
+#         self.assertTemplateUsed(response, 'book/one_book.html')
 #
 #     def test_context_data(self):
-#         self.client.force_login(self.test_user)
-#         response = self.client.get(reverse('books'))
-#         assert response.context['menu'], 'Context data has no menu object!'
+#          self.client.force_login(self.test_user)
+#         response = self.client.get('/pub_house/test/')
+#          assert response.context['menu'], 'Context data has no menu object!'
