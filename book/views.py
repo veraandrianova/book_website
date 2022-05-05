@@ -5,7 +5,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
 
-from .forms import AddBookForm, BookEditForm, RewiewForm
+from .forms import AddBookForm, BookEditForm, RewiewForm, SearchForm
 from .models import Author, PubHouse, Book
 
 # Create your views here.
@@ -243,6 +243,7 @@ class SearchBook(ListView):
     model = Book
     template_name = 'book/all_books.html'
     context_object_name = "books"
+    form_class = SearchForm
 
     # def get_context_data(self, *, object_list=None, **kwargs):
     #     context = super().get_context_data(**kwargs)

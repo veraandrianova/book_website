@@ -32,3 +32,8 @@ class RewiewForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ["body"]
+
+
+class SearchForm(AuthenticationForm):
+    search = forms.CharField(label='Поиск', widget=Textarea(attrs={'rows': 5}))
+

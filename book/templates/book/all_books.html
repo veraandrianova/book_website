@@ -5,53 +5,44 @@
 
 
 {% block content %}
-<table class="table-content" border=0 cellpadding="0" cellspacing="0">
-                <tr>
-                    <td valign="top" class="left-chapters">
-                        <ul id="left-chapters">
-                            <li class="selected">Библиотека</li>
-                            <form action="{% url 'search_book' %}" method="get">
-                                <input name="q" type="text" placeholder="Поиск...">
-                            </form>
-                            <li><a href="{% url 'books' %}">Книги</a></li>
-                            <li><a href="{% url 'author' %}">Авторы</a></li>
-                            <li><a href="{% url 'pub_house' %}">Издательства</a></li>
 
-                        </ul>
-                    </td>
-                    <td valign="top" class="content">
+<form action="{% url 'search_book' %}" method="get">
+    <input name="q" type="text" placeholder="Поиск...">
+</form>
+
 <ul class="list-articles">
-     {% for book in books %}
-              <li>
-{% if book.image %}
-                  <p><img class="imd-article-left thumd" src="{{book.image.url}}"></p>
-{% endif %}
-                  <h2>{{book.title}}</h2>
-     {% autoescape on %}
-     {{book.description|linebreaks|truncatewords:50}}
-     {% endautoescape %}
-              <div class="clear"</div>
-              <p class="link-read-post"><a href="{% url 'book_details' book.slug %}">Читать</a></p>
-              </li>
-     {% endfor %}
+    {% for book in books %}
+    <li>
+        {% if book.image %}
+        <p><img class="imd-article-left thumd" src="{{book.image.url}}"></p>
+        {% endif %}
+        <h2>{{book.title}}</h2>
+        {% autoescape on %}
+        {{book.description|linebreaks|truncatewords:50}}
+        {% endautoescape %}
+        <div class="clear"
+        </div>
+        <p class="link-read-post"><a href="{% url 'book_details' book.slug %}">Читать</a></p>
+    </li>
+    {% endfor %}
 
-<!--     <h3>Средний рейтинг - {{ agg.rating__avg }}</h3>-->
-<!--     <h3>Всего книг - {{ agg.id__count }} </h3>-->
-<!--     <nav>-->
-<!--          <a href="/add_book">Добавить книгу</a>-->
-<!--     </nav>-->
-<!--     <nav>-->
-<!--          <a href="/author">Авторы</a>-->
-<!--     </nav>-->
-<!--     <nav>-->
-<!--          <a href="/pub_house">Издания</a>-->
-<!--     </nav>-->
-<!--     <nav>-->
-<!--          <a href="/accounts/login">Войти</a>-->
-<!--     </nav>-->
-<!--     <nav>-->
-<!--          <a href="/home/signup/">Регистрация</a>-->
-<!--     </nav>-->
+    <!--     <h3>Средний рейтинг - {{ agg.rating__avg }}</h3>-->
+    <!--     <h3>Всего книг - {{ agg.id__count }} </h3>-->
+    <!--     <nav>-->
+    <!--          <a href="/add_book">Добавить книгу</a>-->
+    <!--     </nav>-->
+    <!--     <nav>-->
+    <!--          <a href="/author">Авторы</a>-->
+    <!--     </nav>-->
+    <!--     <nav>-->
+    <!--          <a href="/pub_house">Издания</a>-->
+    <!--     </nav>-->
+    <!--     <nav>-->
+    <!--          <a href="/accounts/login">Войти</a>-->
+    <!--     </nav>-->
+    <!--     <nav>-->
+    <!--          <a href="/home/signup/">Регистрация</a>-->
+    <!--     </nav>-->
 </ul>
 {% endblock %}
 

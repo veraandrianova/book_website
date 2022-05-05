@@ -6,50 +6,40 @@
 
 
 {% block content %}
-<table class="table-content" border=0 cellpadding="0" cellspacing="0">
-                <tr>
-                    <td valign="top" class="left-chapters">
-                        <ul id="left-chapters">
-                            <li class="selected">Библиотека</li>
-                            <form action="{% url 'search_pub_house' %}" method="get">
-                                <input name="q" type="text" placeholder="Поиск...">
-                            </form>
-                            <li><a href="{% url 'books' %}">Книги</a></li>
-                            <li><a href="{% url 'author' %}">Авторы</a></li>
-                            <li><a href="{% url 'pub_house' %}">Издательства</a></li>
 
-                        </ul>
-                    </td>
-                    <td valign="top" class="content">
-<ul class="list-articles">
-    {% for pub_house in pub_houses %}
-    <li><h2>{{pub_house.name_house}}</h2>
-        {% autoescape on %}
-        {{pub_house.description}}
-        {% endautoescape %}
-        <div class="clear"
-        </div>
-        <p class="link-read-post"><a href="{% url 'pub_house_details' pub_house.slug %}">Читать</a></p>
-    </li>
-    {% endfor %}
+<form action="{% url 'search_pub_house' %}" method="get">
+    <input name="q" type="text" placeholder="Поиск...">
+</form>
 
-    <!--     <h3>Средний рейтинг - {{ agg.rating__avg }}</h3>-->
-    <!--     <h3>Всего книг - {{ agg.id__count }} </h3>-->
-    <!--     <nav>-->
-    <!--          <a href="/add_book">Добавить книгу</a>-->
-    <!--     </nav>-->
-    <!--     <nav>-->
-    <!--          <a href="/author">Авторы</a>-->
-    <!--     </nav>-->
-    <!--     <nav>-->
-    <!--          <a href="/pub_house">Издания</a>-->
-    <!--     </nav>-->
-    <!--     <nav>-->
-    <!--          <a href="/accounts/login">Войти</a>-->
-    <!--     </nav>-->
-    <!--     <nav>-->
-    <!--          <a href="/home/signup/">Регистрация</a>-->
-    <!--     </nav>-->
-</ul>
+    <ul class="list-articles">
+        {% for pub_house in pub_houses %}
+        <li><h2>{{pub_house.name_house}}</h2>
+            {% autoescape on %}
+            {{pub_house.description}}
+            {% endautoescape %}
+            <div class="clear"
+            </div>
+            <p class="link-read-post"><a href="{% url 'pub_house_details' pub_house.slug %}">Читать</a></p>
+        </li>
+        {% endfor %}
+
+        <!--     <h3>Средний рейтинг - {{ agg.rating__avg }}</h3>-->
+        <!--     <h3>Всего книг - {{ agg.id__count }} </h3>-->
+        <!--     <nav>-->
+        <!--          <a href="/add_book">Добавить книгу</a>-->
+        <!--     </nav>-->
+        <!--     <nav>-->
+        <!--          <a href="/author">Авторы</a>-->
+        <!--     </nav>-->
+        <!--     <nav>-->
+        <!--          <a href="/pub_house">Издания</a>-->
+        <!--     </nav>-->
+        <!--     <nav>-->
+        <!--          <a href="/accounts/login">Войти</a>-->
+        <!--     </nav>-->
+        <!--     <nav>-->
+        <!--          <a href="/home/signup/">Регистрация</a>-->
+        <!--     </nav>-->
+    </ul>
     {% endblock %}
 

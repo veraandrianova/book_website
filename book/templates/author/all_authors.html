@@ -5,36 +5,27 @@
 
 
 {% block content %}
-<table class="table-content" border=0 cellpadding="0" cellspacing="0">
-                <tr>
-                    <td valign="top" class="left-chapters">
-                        <ul id="left-chapters">
-                            <li class="selected">Библиотека</li>
-                            <form action="{% url 'search_author' %}" method="get">
-                                <input name="q" type="text" placeholder="Поиск...">
-                            </form>
-                            <li><a href="{% url 'books' %}">Книги</a></li>
-                            <li><a href="{% url 'author' %}">Авторы</a></li>
-                            <li><a href="{% url 'pub_house' %}">Издательства</a></li>
 
-                        </ul>
-                    </td>
-                    <td valign="top" class="content">
+<form action="{% url 'search_author' %}" method="get">
+    <input name="q" type="text" placeholder="Поиск...">
+</form>
+
 <ul class="list-articles">
-     {% for author in authors %}
-              <li>
-              <li>
-{% if author.image %}
-                  <p><img class="imd-article-left thumd" src="{{author.image.url}}"></p>
-{% endif %}
-                  <h2>{{author.name}}</h2>
-     {% autoescape on %}
-     {{author.description}}
-     {% endautoescape %}
-              <div class="clear"</div>
-              <p class="link-read-post"><a href="{% url 'author_details' author.slug %}">Читать</a></p>
-              </li>
-     {% endfor %}
-    
-{% endblock %}
+    {% for author in authors %}
+    <li>
+    <li>
+        {% if author.image %}
+        <p><img class="imd-article-left thumd" src="{{author.image.url}}"></p>
+        {% endif %}
+        <h2>{{author.name}}</h2>
+        {% autoescape on %}
+        {{author.description}}
+        {% endautoescape %}
+        <div class="clear"
+        </div>
+        <p class="link-read-post"><a href="{% url 'author_details' author.slug %}">Читать</a></p>
+    </li>
+    {% endfor %}
+
+    {% endblock %}
 

@@ -9,8 +9,9 @@
     <div class="from-error">{{ f.errors }}</div>
     {% endfor %}
     <input type="submit" value="Сохранить">
+    <a href="{% url 'delete_user' user.pk %}"> Удалить</a>
 </form>
 
-<a href="{% url 'delete_user' user.pk %}">Удалить</a>
-<a href="{% url 'books' %}">Главная</a>
+<!--<a href="{% url 'delete_user' user.pk %}">Удалить</a>-->
+<!--<a href="{% url 'books' %}">Главная</a>-->
 {% endblock %}

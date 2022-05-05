@@ -21,6 +21,6 @@ class Customer(AbstractUser):
     age = models.IntegerField('возраст', validators=[MinValueValidator(1),
                                                      MaxValueValidator(100)], default=18)
     sex = models.CharField(max_length=10, choices=SEX_CHOICES, default='male', verbose_name='пол')
-
-    def get_absolute_url(self):
-        return reverse('user_detail', args=[str(self.id)])
+    #
+    # def get_absolute_url(self):
+    #     return reverse('user_detail', args=[str(self.id)])
