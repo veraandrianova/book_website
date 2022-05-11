@@ -205,18 +205,19 @@ class TestAddBookView(TestCase):
 
     def edit_book(self):
         self.client.force_login(self.test_user)
-        response = self.client.post(reverse('add_book'), data={
-            'title': 'Test book',
-            'description': 'Some text',
-            'author': '1',
-            'pub_house': [str(self.pub_house.id)]
-        })
-        assert response.status_code == 302, f'Status code is not 302! code={response.status_code}'
-        book = Book.objects.get(id=1)
-        assert book
-        assert book.creator == self.test_user, 'Book creator is not test_user!'
-        assert book.author == Author.objects.get(id=1)
-        assert book.pub_house.first() == self.pub_house, f'Book pub_house={book.pub_house}, pub_house must be {self.pub_house}'
+        book = Book.objects.create(title='test-book')
+        # response = self.client.post(reverse('add_book'), data={
+        #     'title': 'Test book',
+        #     'description': 'Some text',
+        #     'author': '1',
+        #     'pub_house': [str(self.pub_house.id)]
+        # })
+        # assert response.status_code == 302, f'Status code is not 302! code={response.status_code}'
+        # book = Book.objects.get(id=1)
+        # assert book
+        # assert book.creator == self.test_user, 'Book creator is not test_user!'
+        # assert book.author == Author.objects.get(id=1)
+        # assert book.pub_house.first() == self.pub_house, f'Book pub_house={book.pub_house}, pub_house must be {self.pub_house}'
         response = self.client.get(reverse('/book/test-book/'))
         assert response.status_code == 200, 'Код ответа не 200!'
         client_post_response = self.client.post(
@@ -233,20 +234,21 @@ class TestAddBookView(TestCase):
 
 
 
-    def delite_book(self):
+    def delete_book(self):
         self.client.force_login(self.test_user)
-        response = self.client.post(reverse('add_book'), data={
-            'title': 'Test book',
-            'description': 'Some text',
-            'author': '1',
-            'pub_house': [str(self.pub_house.id)]
-        })
-        assert response.status_code == 302, f'Status code is not 302! code={response.status_code}'
-        book = Book.objects.get(id=1)
-        assert book
-        assert book.creator == self.test_user, 'Book creator is not test_user!'
-        assert book.author == Author.objects.get(id=1)
-        assert book.pub_house.first() == self.pub_house, f'Book pub_house={book.pub_house}, pub_house must be {self.pub_house}'
+        book = Book.objects.create(title='test-book')
+        # response = self.client.post(reverse('add_book'), data={
+        #     'title': 'Test book',
+        #     'description': 'Some text',
+        #     'author': '1',
+        #     'pub_house': [str(self.pub_house.id)]
+        # })
+        # assert response.status_code == 302, f'Status code is not 302! code={response.status_code}'
+        # book = Book.objects.get(id=1)
+        # assert book
+        # assert book.creator == self.test_user, 'Book creator is not test_user!'
+        # assert book.author == Author.objects.get(id=1)
+        # assert book.pub_house.first() == self.pub_house, f'Book pub_house={book.pub_house}, pub_house must be {self.pub_house}'
         response = self.client.get(reverse('/book/test-book/'))
         assert response.status_code == 200, 'Код ответа не 200!'
         client_delete_response = self.client.post(
@@ -364,6 +366,7 @@ class TestBookAll(TestCase):
         assert response.context['menu'], 'Context data has no menu object!'
 
 
+
 class TestShowAuthor(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -478,17 +481,19 @@ class TestAddCustomerView(TestCase):
         super().setUpClass()
         cls.client = Client()
         cls.test_user = User.objects.create(username='test_user')
-        cls.test_user_1 = User.objects.create(username='test_user_1')
 
-    @classmethod
-    def setUpTestData(cls):
-        # Set up non-modified objects used by all test methods
-        Customer.objects.create(username='Big', password='qwerty')
+
+    # @classmethod
+    # def setUpTestData(cls):
+    #     # Set up non-modified objects used by all test methods
+    #     Customer.objects.create(username='Big', password='qwerty')
 
     def test_login_required(self):
         unauthorized_client = Client()
         response = unauthorized_client.get(reverse('/signup/'))
         assert response.status_code == 302, 'Unauthorized user does not redirected to login page!'
+
+
 
 
     # def test_context_data(self):

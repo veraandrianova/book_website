@@ -17,7 +17,7 @@
         {% if author.image %}
         <p><img class="imd-article-left thumd" src="{{author.image.url}}"></p>
         {% endif %}
-        <h2>{{author.name}}</h2>
+        <h2>{{ author.firstname }} {{ author.lastname }}</h2>
         {% autoescape on %}
         {{author.description}}
         {% endautoescape %}
