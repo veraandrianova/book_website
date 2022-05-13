@@ -157,12 +157,10 @@ class ShowBook(FormMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
         context['books_selected'] = 0
-        print(context)
         return context
 
     def get_success_url(self):
         slug = self.kwargs['slug']
-
         return reverse('book_details', kwargs={'slug': slug})
 
     def post(self, request, *args, **kwargs):

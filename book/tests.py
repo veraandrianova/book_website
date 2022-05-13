@@ -6,7 +6,7 @@ from django.template.defaultfilters import slugify
 from django.test import TestCase, Client
 
 from user.models import Customer
-from .models import Author, PubHouse, Book
+from .models import Author, PubHouse, Book, Comment
 
 User = get_user_model()
 
@@ -403,6 +403,7 @@ class TestShowBook(TestCase):
     def setUpTestData(cls):
         test_user = Customer.objects.create(username='test_username')
         Book.objects.create(title='test1', creator=test_user, description='test')
+        # Comment.objects.create(body='Test comment', creator=test_user)
 
     def test_one_book_url(self):
         response = self.client.get('/book/test1/')
@@ -418,6 +419,20 @@ class TestShowBook(TestCase):
         self.client.force_login(self.test_user)
         response = self.client.get('/book/test1/')
         assert response.context['menu'], 'Context data has no menu object!'
+        assert response.context['form'], 'Context data has no form!'
+
+
+    # def test_comment_creator(self):
+    #     self.client.force_login(self.test_user)
+    #     response = self.client.post('/book/test1/', data={
+    #         'body': 'Test comment'})
+    #     assert response.status_code == 302, f'Status code is not 302! code={response.status_code}'
+        # book = Book.objects.get(id=1)
+        # assert book
+        # assert book.creator == self.test_user, 'Book creator is not test_user!'
+        # assert book.body == Comment.objects.get(id=1)
+
+
 
 
 
@@ -485,7 +500,7 @@ class CustomerModelTest(TestCase):
         self.assertEquals(max_length, 10)
 
 
-class TestAddCustomerView(TestCase):
+class TestRegistrationCustomerView(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -497,23 +512,93 @@ class TestAddCustomerView(TestCase):
         response = unauthorized_client.get('/signup/')
         assert response.status_code == 200, 'Unauthorized user does not redirected to login page!'
 
-    # def test_context_data(self):
-    #     self.client.force_login(self.test_user)
-    #     response = self.client.get(reverse('add_book'))
-    #     assert response.context['menu'], 'Context data has no menu object!'
-    #     assert response.context['form'], 'Context data has no form!'
-    #
-    # def test_book_creator(self):
-    #     self.client.force_login(self.test_user)
-    #     response = self.client.post(reverse('add_book'), data={
-    #         'title': 'Test book',
-    #         'description': 'Some text',
-    #         'author': '1',
-    #         'pub_house': [str(self.pub_house.id)]
-    #     })
-    #     assert response.status_code == 302, f'Status code is not 302! code={response.status_code}'
-    #     book = Book.objects.get(id=1)
-    #     assert book
-    #     assert book.creator == self.test_user, 'Book creator is not test_user!'
-    #     assert book.author == Author.objects.get(id=1)
-    #     assert book.pub_house.first() == self.pub_house, f'Book pub_house={book.pub_house}, pub_house must be {self.pub_house}'
+    def test_context_data(self):
+        self.client.force_login(self.test_user)
+        response = self.client.get('/signup/')
+        assert response.context['menu'], 'Context data has no menu object!'
+        assert response.context['form'], 'Context data has no form!'
+
+    def test_user_creator(self):
+        self.client.force_login(self.test_user)
+        response = self.client.post('/signup/', data={
+            'username': 'test1',
+            'email': 'test@mail.ru',
+            'password1': 'qwerty',
+            'password2': 'qwerty'
+        })
+        assert response.status_code == 200, f'Status code is not 302! code={response.status_code}'
+        user = Customer.objects.get(id=1)
+        assert user
+
+class TestLoginUserView(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.client = Client()
+        cls.test_user = User.objects.create(username='test_user')
+
+    @classmethod
+    def setUpTestData(cls):
+        test_user = Customer.objects.create(username='test_username')
+        Customer.objects.create(username='test1', email='test1@mail.ru', password='qwerty')
+
+    def test_login_page(self):
+        unauthorized_client = Client()
+        response = unauthorized_client.get('/login/')
+        assert response.status_code == 200, 'Unauthorized user does not redirected to login page!'
+
+    def test_context_data(self):
+        self.client.force_login(self.test_user)
+        response = self.client.get('/login/')
+        assert response.context['menu'], 'Context data has no menu object!'
+        assert response.context['form'], 'Context data has no form!'
+
+    def test_user_creator(self):
+        self.client.force_login(self.test_user)
+        response = self.client.post('/login/', data={
+            'username': 'test1',
+            'password': 'qwerty',
+        })
+        assert response.status_code == 200, f'Status code is not 302! code={response.status_code}'
+        user = Customer.objects.get(id=1)
+        assert user
+
+
+    def edit_user(self):
+        self.client.force_login(self.test_user)
+        user = Customer.objects.create(username='test1', email='test1@mail.ru', password='qwerty')
+        response = self.client.get(reverse('/users/1/update/'))
+        assert response.status_code == 200, 'Код ответа не 200!'
+        client_post_response = self.client.post(
+            reverse('users/1/update/',
+                    {
+                        'username': 'test',
+                        'first_name': 'first_name',
+                        'last_name': 'last_name',
+                        'phone': '89998887766',
+                        'age': '20',
+                        'sex': 'male'
+                    }
+                    ))
+        self.assertEqual(client_post_response.status_code, 302)
+        user.refresh_from_db()
+        assert user.username == 'test', f'Логин не поменялся! Текущее значение: {user.username}'
+        assert user.first_name == 'first_name', f'Имя не поменялось! Текущее значение: {user.first_name}'
+        assert user.last_name == 'last_name', f'Фамилия не поменялась! Текущее значение: {user.last_name}'
+        assert user.phone == '89998887766', f'Телефон не поменялся! Текущее значение: {user.phone}'
+        assert user.age == '20', f'Возраст не поменялся! Текущее значение: {user.age}'
+        assert user.sex == 'male', f'Пол не поменялся! Текущее значение: {user.sex}'
+
+    def delete_book(self):
+        self.client.force_login(self.test_user)
+        user = Customer.objects.create(username='test1', email='test1@mail.ru', password='qwerty')
+        response = self.client.get(reverse('/users/1/delete/'))
+        assert response.status_code == 200, 'Код ответа не 200!'
+        client_delete_response = self.client.post(
+            reverse('/users/1/delete//'))
+        self.assertEqual(client_delete_response.status_code, 302)
+
+    # def test_logout_page(self):
+    #     unauthorized_client = Client()
+    #     response = unauthorized_client.get('/logout/')
+    #     assert response.status_code == 200, 'Unauthorized user does not redirected to login page!'
