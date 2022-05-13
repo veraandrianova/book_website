@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Поиск{% endblock %}
+
+
+{% block content %}
+
+
+<form action="{% url 'search' %}" method="get">
+    <input name="q" type="text" placeholder="Поиск...">
+</form>
+<ul class="list-articles">
+    {% for result in object_list %}
+    <li>
+
+        {% if result.type == 'book' %}
+            {% include 'search/book_item.html' %}
+        {% elif result.type == 'author' %}
+            {% include 'search/author_item.html' %}
+        {% elif result.type == 'pub_house' %}
+            {% include 'search/pubhouse_item.html' %}
+        {% endif %}
+
+
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock content %}

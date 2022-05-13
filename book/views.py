@@ -2,16 +2,18 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormMixin
-
-from .forms import AddBookForm, BookEditForm, RewiewForm, SearchForm
+from django.db.models import Q
+from .forms import AddBookForm, BookEditForm, RewiewForm
 from .models import Author, PubHouse, Book
 
 # Create your views here.
 menu = [{'title': "Добавить книгу", 'url_name': "add_book"},
+        {'title': "Поиск", 'url_name': "search"},
 
         ]
+
 
 def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1> Страница не найдена</h1>')
@@ -239,65 +241,131 @@ class ShowPubHouse(DetailView):
 #
 #     })
 
-class SearchBook(ListView):
-    model = Book
-    template_name = 'book/all_books.html'
-    context_object_name = "books"
-    form_class = SearchForm
+class SearchView(TemplateView):
+    template_name = 'search/search_results.html'
 
-    # def get_context_data(self, *, object_list=None, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['menu'] = menu
-    #     return context
-    #
-    # def get_queryset(self):
-    #     query = self.request.GET.get('q')
-    #     books = Book.objects.filter(
-    #         Q(title__icontains=query)
-    #
-    #     )
-    #     return books
-    def get_queryset(self):
-        print(self.request.GET.get('q'))
-        queryset = Book.objects.filter(title__icontains=self.request.GET.get("q").title())
-        return queryset
+    def get_books(self):
+        books = Book.objects.none()
+        if self.request.GET.get('q'):
+            books = Book.objects.filter(title__icontains=self.request.GET.get('q'))
+        return books
 
-    def get_context_data(self, *args, **kwargs):
+    def get_authors(self):
+        authors = Author.objects.none()
+        if self.request.GET.get('q'):
+            authors = Author.objects.filter(Q(lastname__icontains=self.request.GET.get('q').title()) |
+                                            Q(firstname__icontains=self.request.GET.get('q').title()))
+        return authors
+
+    def get_books(self):
+        books = Book.objects.none()
+        if self.request.GET.get('q'):
+            books = Book.objects.filter(title__icontains=self.request.GET.get('q').title())
+        return books
+
+    def get_pub_houses(self):
+        pub_houses = PubHouse.objects.none()
+        if self.request.GET.get('q'):
+            pub_houses = PubHouse.objects.filter(name_house__icontains=self.request.GET.get('q').title())
+        return pub_houses
+
+    def get_object_list(self):
+        object_list = []
+        for book in self.get_books():
+            object_dict = {
+                'type': 'book',
+                'title': book.title,
+                'url': book.get_absolute_url(),
+                'object': book
+            }
+            object_list.append(object_dict)
+
+        for author in self.get_authors():
+            object_dict = {
+                'type': 'author',
+                'lastname': author.lastname,
+                'firstname': author.firstname,
+                'object': author
+            }
+            object_list.append(object_dict)
+
+        for pub_house in self.get_pub_houses():
+            object_dict = {
+                'type': 'pub_house',
+                'name_house': pub_house.name_house,
+                'object': pub_house
+            }
+            object_list.append(object_dict)
+        return object_list
+
+
+
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['q'] = self.request.GET.get("q")
-        context['menu'] = menu
+        context['object_list'] = self.get_object_list()
         return context
 
-
-
-class SearchAuthor(ListView):
-    model = Author
-    template_name = 'author/all_authors.html'
-    context_object_name = "authors"
-
-    def get_queryset(self):
-        print(self.request.GET.get('q'))
-        queryset = Author.objects.filter(lastname__icontains=self.request.GET.get("q").title())
-        return queryset
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['q'] = self.request.GET.get("q")
-        context['menu'] = menu
-        return context
-
-class SearchPubHouse(ListView):
-    model = PubHouse
-    template_name = 'pub_house/all_pub_houses.html'
-    context_object_name = "pub_houses"
-
-    def get_queryset(self):
-        print(self.request.GET.get('q'))
-        queryset = PubHouse.objects.filter(name_house__icontains=self.request.GET.get("q").title())
-        return queryset
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['q'] = self.request.GET.get("q")
-        context['menu'] = menu
-        return context
+#
+#
+# class SearchBook(ListView):
+#     model = Book
+#     template_name = 'book/all_books.html'
+#     context_object_name = "books"
+#     form_class = SearchForm
+#
+# def get_context_data(self, *, object_list=None, **kwargs):
+#     context = super().get_context_data(**kwargs)
+#     context['menu'] = menu
+#     return context
+#
+# def get_queryset(self):
+#     query = self.request.GET.get('q')
+#     books = Book.objects.filter(
+#         Q(title__icontains=query)
+#
+#     )
+#     return books
+#     def get_queryset(self):
+#         print(self.request.GET.get('q'))
+#         queryset = Book.objects.filter(title__icontains=self.request.GET.get("q").title())
+#         return queryset
+#
+#     def get_context_data(self, *args, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['q'] = self.request.GET.get("q")
+#         context['menu'] = menu
+#         return context
+#
+#
+#
+# class SearchAuthor(ListView):
+#     model = Author
+#     template_name = 'author/all_authors.html'
+#     context_object_name = "authors"
+#
+#     def get_queryset(self):
+#         print(self.request.GET.get('q'))
+#         queryset = Author.objects.filter(lastname__icontains=self.request.GET.get("q").title())
+#         return queryset
+#
+#     def get_context_data(self, *args, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['q'] = self.request.GET.get("q")
+#         context['menu'] = menu
+#         return context
+#
+# class SearchPubHouse(ListView):
+#     model = PubHouse
+#     template_name = 'pub_house/all_pub_houses.html'
+#     context_object_name = "pub_houses"
+#
+#     def get_queryset(self):
+#         print(self.request.GET.get('q'))
+#         queryset = PubHouse.objects.filter(name_house__icontains=self.request.GET.get("q").title())
+#         return queryset
+#
+#     def get_context_data(self, *args, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['q'] = self.request.GET.get("q")
+#         context['menu'] = menu
+#         return context

@@ -1,0 +1,7 @@
+<div>
+    <h3>{{ result.object.title }}</h3>
+    {% if result.object.image %}
+        <p><img src="{{ result.object.image.url }}"></p>
+    {% endif %}
+    <a href="{% url 'book_details' result.object.slug %}">Читать</a>
+</div>

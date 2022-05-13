@@ -6,9 +6,6 @@
 
 {% block content %}
 
-<form action="{% url 'search_book' %}" method="get">
-    <input name="q" type="text" placeholder="Поиск...">
-</form>
 
 <ul class="list-articles">
     {% for book in books %}
@@ -20,8 +17,7 @@
         {% autoescape on %}
         {{book.description|linebreaks|truncatewords:50}}
         {% endautoescape %}
-        <div class="clear"
-        </div>
+        <div class="clear"></div>
         <p class="link-read-post"><a href="{% url 'book_details' book.slug %}">Читать</a></p>
     </li>
     {% endfor %}

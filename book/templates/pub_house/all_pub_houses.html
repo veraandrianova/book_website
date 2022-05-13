@@ -7,10 +7,6 @@
 
 {% block content %}
 
-<form action="{% url 'search_pub_house' %}" method="get">
-    <input name="q" type="text" placeholder="Поиск...">
-</form>
-
     <ul class="list-articles">
         {% for pub_house in pub_houses %}
         <li><h2>{{pub_house.name_house}}</h2>

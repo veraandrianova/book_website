@@ -6,9 +6,6 @@
 
 {% block content %}
 
-<form action="{% url 'search_author' %}" method="get">
-    <input name="q" type="text" placeholder="Поиск...">
-</form>
 
 <ul class="list-articles">
     {% for author in authors %}
