@@ -104,7 +104,7 @@ class Book(models.Model):
 
 
 class Comment(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comment_book')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comments')
     creator = models.ForeignKey('user.Customer', on_delete=models.CASCADE, default=1, verbose_name='автор комментария')
     body = models.TextField('текст')
     created = models.DateTimeField('создано',auto_now_add=True)

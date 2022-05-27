@@ -206,6 +206,8 @@ class PubHouseAll(ListView):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
         context['pub_houses_selected'] = 0
+        print(context)
+
         return context
 
 

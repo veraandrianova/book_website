@@ -262,7 +262,12 @@ class TestAuthorAll(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('is_paginated' in resp.context)
         self.assertTrue(resp.context['is_paginated'] == True)
-        # self.assertTrue( len(resp.context['all_authors']) == 5)
+        assert resp.context['paginator'].num_pages == 5, f'Num pages is {resp.context["paginator"].num_pages}'
+        self.assertFalse(resp.context['page_obj'].has_previous())
+        self.assertTrue(resp.context['page_obj'].has_next())
+        self.assertEqual(len(resp.context['page_obj']), 3)
+        resp_page_3 = self.client.get(reverse('author') + '?page=3')
+        self.assertEqual(resp_page_3.context['page_obj'].number, 3)
 
     def test_context_data(self):
         self.client.force_login(self.test_user)
@@ -279,7 +284,6 @@ class TestPubHouseAll(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # Create 13 authors for pagination tests
         number_of_pub_house = 13
         for pub_house_num in range(number_of_pub_house):
             PubHouse.objects.create(name_house='test %s' % pub_house_num, email='test %s' % pub_house_num, )
@@ -302,7 +306,12 @@ class TestPubHouseAll(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('is_paginated' in resp.context)
         self.assertTrue(resp.context['is_paginated'] == True)
-        # self.assertTrue(len(resp.context['all_pub_houses']) == 5)
+        assert resp.context['paginator'].num_pages == 5, f'Num pages is {resp.context["paginator"].num_pages}'
+        self.assertFalse(resp.context['page_obj'].has_previous())
+        self.assertTrue(resp.context['page_obj'].has_next())
+        self.assertEqual(len(resp.context['page_obj']), 3)
+        resp_page_3 = self.client.get(reverse('pub_house') + '?page=3')
+        self.assertEqual(resp_page_3.context['page_obj'].number, 3)
 
     def test_context_data(self):
         self.client.force_login(self.test_user)
@@ -341,6 +350,14 @@ class TestBookAll(TestCase):
         self.client.force_login(self.test_user)
         response = self.client.get(reverse('books'))
         assert response.context['menu'], 'Context data has no menu object!'
+
+    def test_pagination_is_five(self):
+        resp = self.client.get(reverse('books'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('is_paginated' in resp.context)
+        assert resp.context['paginator'].num_pages == 1, f'Num pages is {resp.context["paginator"].num_pages}'
+        self.assertFalse(resp.context['page_obj'].has_previous())
+        self.assertFalse(resp.context['page_obj'].has_next())
 
 
 class TestShowAuthor(TestCase):
@@ -422,15 +439,16 @@ class TestShowBook(TestCase):
         assert response.context['form'], 'Context data has no form!'
 
 
-    # def test_comment_creator(self):
-    #     self.client.force_login(self.test_user)
-    #     response = self.client.post('/book/test1/', data={
-    #         'body': 'Test comment'})
-    #     assert response.status_code == 302, f'Status code is not 302! code={response.status_code}'
-        # book = Book.objects.get(id=1)
-        # assert book
-        # assert book.creator == self.test_user, 'Book creator is not test_user!'
-        # assert book.body == Comment.objects.get(id=1)
+    def test_comment_creator(self):
+        self.client.force_login(self.test_user)
+        response = self.client.post('/book/test1/', data={
+            'body': 'Test comment'})
+        assert response.status_code == 302, f'Status code is not 302! code={response.status_code}'
+        book = Book.objects.get(id=1)
+        comments = book.comments.all()
+        assert comments.count()
+        assert comments.first().body == 'Test comment', 'Comment is not test comment'
+
 
 
 
@@ -553,6 +571,7 @@ class TestLoginUserView(TestCase):
         assert response.context['menu'], 'Context data has no menu object!'
         assert response.context['form'], 'Context data has no form!'
 
+
     def test_user_creator(self):
         self.client.force_login(self.test_user)
         response = self.client.post('/login/', data={
@@ -598,7 +617,9 @@ class TestLoginUserView(TestCase):
             reverse('/users/1/delete//'))
         self.assertEqual(client_delete_response.status_code, 302)
 
-    # def test_logout_page(self):
-    #     unauthorized_client = Client()
-    #     response = unauthorized_client.get('/logout/')
-    #     assert response.status_code == 200, 'Unauthorized user does not redirected to login page!'
+    def test_logout_page(self):
+
+        authorized_client = Client()
+        authorized_client.force_login(self.test_user)
+        response = authorized_client.get('/logout/')
+        assert response.status_code == 302, 'Unauthorized user does not redirected to login page!'
