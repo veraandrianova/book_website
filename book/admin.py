@@ -1,7 +1,5 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 from .models import Book, Author, PubHouse, BookPlace, Comment
-from django.utils.translation import gettext_lazy as _
 
 
 class RatingFilter(admin.SimpleListFilter):

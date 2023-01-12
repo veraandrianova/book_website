@@ -3,12 +3,10 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from transliterate import translit
-from user.models import Customer
-
-
 
 
 class Author(models.Model):
+    """Модель автора"""
     class Meta:
         verbose_name = 'автор'
         verbose_name_plural = 'авторы'
@@ -18,7 +16,6 @@ class Author(models.Model):
     image = models.ImageField("Постер", upload_to="movies/", blank=True)
     description = models.TextField("Описание", blank=True)
     slug = models.SlugField(default='', null=False, blank=True)
-
 
     def save(self, *args, **kwargs):
         self.slug = slugify(translit(f'{self.firstname} {self.lastname}', 'ru', reversed=True))
@@ -32,6 +29,7 @@ class Author(models.Model):
 
 
 class PubHouse(models.Model):
+    """Модель издательства"""
     class Meta:
         verbose_name = 'издание'
         verbose_name_plural = 'издания'
@@ -53,6 +51,7 @@ class PubHouse(models.Model):
 
 
 class BookPlace(models.Model):
+    """Модель место книги - не используется"""
     class Meta:
         verbose_name = 'место книги'
         verbose_name_plural = 'места книг'
@@ -67,6 +66,7 @@ class BookPlace(models.Model):
 
 
 class Book(models.Model):
+    """Модель книги"""
     class Meta:
         verbose_name = 'книга'
         verbose_name_plural = 'книги'
@@ -90,7 +90,6 @@ class Book(models.Model):
     book_place = models.OneToOneField(BookPlace, on_delete=models.SET_NULL, null=True, blank=True)
     creator = models.ForeignKey('user.Customer', on_delete=models.CASCADE, verbose_name='создатель')
 
-
     def save(self, *args, **kwargs):
         self.slug = slugify(translit(self.title, 'ru', reversed=True))
         super(Book, self).save(*args, **kwargs)
@@ -102,8 +101,8 @@ class Book(models.Model):
         return f"{self.title} - {self.rating}"
 
 
-
 class Comment(models.Model):
+    """Модель комментариев"""
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comments')
     creator = models.ForeignKey('user.Customer', on_delete=models.CASCADE, default=1, verbose_name='автор комментария')
     body = models.TextField('текст')

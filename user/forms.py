@@ -1,8 +1,6 @@
-from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UsernameField, AuthenticationForm
 from django.core.exceptions import ValidationError
-from django.forms import Textarea
 from .models import Customer
 
 
@@ -11,7 +9,6 @@ class CustomerForm(UserCreationForm):
     email = forms.EmailField(label='Электронная почта')
     password1 = forms.CharField(label='Пароль')
     password2 = forms.CharField(label='Повтор пароля')
-    captcha = CaptchaField(label='Введите код с картинки')
 
     class Meta:
         model = Customer

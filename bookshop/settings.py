@@ -40,10 +40,6 @@ INSTALLED_APPS = [
     'book',
     'user',
     'django_extensions',
-    'captcha',
-    'taggit',
-
-
 
 ]
 

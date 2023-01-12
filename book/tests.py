@@ -11,9 +11,6 @@ from .models import Author, PubHouse, Book, Comment
 User = get_user_model()
 
 
-# Create your tests here.
-
-
 class AuthorModelTest(TestCase):
 
     @classmethod
@@ -438,7 +435,6 @@ class TestShowBook(TestCase):
         assert response.context['menu'], 'Context data has no menu object!'
         assert response.context['form'], 'Context data has no form!'
 
-
     def test_comment_creator(self):
         self.client.force_login(self.test_user)
         response = self.client.post('/book/test1/', data={
@@ -448,10 +444,6 @@ class TestShowBook(TestCase):
         comments = book.comments.all()
         assert comments.count()
         assert comments.first().body == 'Test comment', 'Comment is not test comment'
-
-
-
-
 
 
 class TestSearchView(TestCase):
@@ -548,6 +540,7 @@ class TestRegistrationCustomerView(TestCase):
         user = Customer.objects.get(id=1)
         assert user
 
+
 class TestLoginUserView(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -571,7 +564,6 @@ class TestLoginUserView(TestCase):
         assert response.context['menu'], 'Context data has no menu object!'
         assert response.context['form'], 'Context data has no form!'
 
-
     def test_user_creator(self):
         self.client.force_login(self.test_user)
         response = self.client.post('/login/', data={
@@ -581,7 +573,6 @@ class TestLoginUserView(TestCase):
         assert response.status_code == 200, f'Status code is not 302! code={response.status_code}'
         user = Customer.objects.get(id=1)
         assert user
-
 
     def edit_user(self):
         self.client.force_login(self.test_user)

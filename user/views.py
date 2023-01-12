@@ -19,6 +19,7 @@ def pageNotFound(request, exception):
 
 
 class LoginUser(LoginView):
+    """Представление входа"""
     form_class = LoginUserForm
     template_name = "registration/login.html"
 
@@ -33,11 +34,13 @@ class LoginUser(LoginView):
 
 
 def logout_user(request):
+    """Представление выхода"""
     logout(request)
     return redirect('login')
 
 
 class SignUp(CreateView):
+    """Представление регистрации"""
     form_class = CustomerForm
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
@@ -54,6 +57,7 @@ class SignUp(CreateView):
 
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
+    """Представление редактирование профиля пользователя"""
     model = Customer
     template_name = 'registration/create_one.html'
     form_class = CustomerEditForm
@@ -61,33 +65,9 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse('update_user', kwargs={'pk': self.kwargs['pk']})
 
-    # def get_object(self, *args, **kwargs):
-    #     return self.request.user
-
 
 class ProfileDeleteView(LoginRequiredMixin, DeleteView):
+    """Представление удаление профиля пользователя"""
     model = Customer
     template_name = 'registration/delete_user.html'
     success_url = reverse_lazy('books')
-
-# class CreateUser(CreateView):
-#     model = Users
-#     template_name = 'users/create.html'
-#     fields = ['firstname', 'lastname', 'email', 'phone', 'age', 'sex']
-#
-# def users_create(request):
-#     form = UsersForm(request.POST or None)
-#     if form.is_valid():
-#         form.save()
-#         return redirect('users')
-#     else:
-#         context = {'form': form}
-#
-#     return render(request, 'users/create.html', context)
-#
-#
-# def one_create(request, id: int):
-#     user = get_object_or_404(Users, id=id)
-#     return render(request, 'users/create_one.html', {
-#         'user': user
-#     })

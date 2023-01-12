@@ -27,8 +27,6 @@ urlpatterns = [
     path('', include('book.urls')),
     path('', include('user.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    # path('home/', include('book.urls')),
-    path('captcha/', include('captcha.urls'))
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
