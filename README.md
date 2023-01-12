@@ -25,6 +25,9 @@ Python 3.10, Django 4.0.6, SQLite
 #### Создать суперпользователя
     python manage.py createsuperuser
 
+#### Создать миграции
+    python manage.py migrate
+
 #### Запустить приложение 
     python manage.py runserver
 
