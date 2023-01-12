@@ -29,4 +29,4 @@ Python 3.10, Django 4.0.6, SQLite
     python manage.py runserver
 
 
-### Стили https://proproprogs.ru/
+##### Стили https://proproprogs.ru/
