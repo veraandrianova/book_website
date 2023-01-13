@@ -18,10 +18,6 @@ Python 3.10, Django 4.0.6, SQLite
 ##### Установите необходимые зависимости.
     pip install -r requirements.txt
 
-##### Создать миграции
-    python manage.py makemigration
-    python manage.py migrate
-
 #### Создать суперпользователя
     python manage.py createsuperuser
 
