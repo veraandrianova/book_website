@@ -30,6 +30,8 @@ Python 3.10, Django 4.0.6, SQLite
 
 #### Запустить приложение 
     python manage.py runserver
-
+    
+#### Запустить тесты 
+    python manage.py test    
 
 ##### Стили https://proproprogs.ru/
